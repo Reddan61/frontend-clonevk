@@ -1,0 +1,50 @@
+@import "@/_vars.scss";
+
+.register {
+    &__title {
+        width: 100%;
+        display: block;
+        text-align: center;
+        font-size: 20px;
+        line-height: 24px;
+    }
+    &__subtitle {
+        font-size: 13px;
+        line-height: 16px;
+        display: block;
+        text-align: center;
+        color:$secondary;
+        margin: 2px 0 26px;
+    }
+    &__surname {
+        margin: 11px 0 0;
+    }
+    &__dateInfo {
+        display: block;
+        margin: 20px 0 12px;
+        color:#818C99;
+        font-size: 13px;
+    }
+    &__date {
+        display: flex;
+    }
+    &__day {
+        max-width: 75px;
+    }
+    &__month {
+        max-width: 92px;
+        margin: 0 12px;
+    }
+    &__submit {
+        width: 100%;
+        text-align: center;
+        margin: 28px 0 0;
+        font-size: 14px;
+        color: white;
+        background-color: #4BB34B;
+        padding: 0 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        height: 36px;
+    }
+}

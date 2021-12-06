@@ -1,0 +1,18 @@
+.login {
+    &__email {
+        margin-bottom: 15px;
+    }
+    &__password {
+        margin-bottom: 20px;
+    }
+    &__submit {
+        color:white;    
+        background-color: #5181B8;
+        padding: 8px 30px;
+        border-radius: 4px;
+        font-size: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

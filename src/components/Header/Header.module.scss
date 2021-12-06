@@ -1,0 +1,17 @@
+@import "@/_vars.scss";
+
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    &__container {
+        display: flex;
+        max-width: $container;
+        width: 100%;
+        padding: 0 15px 0;
+    }
+    &__logo {
+        padding: 10px 0 10px;
+    }
+}

@@ -1,0 +1,70 @@
+@import "@/_vars.scss";
+$background:#edeef0;
+
+.auth {
+    width: 100%;
+    min-height: calc(100vh - 46px);
+    background-color: $background;
+    padding: 18px 0 0;
+    display: flex;
+    justify-content: center;
+    &__container {
+        display: flex;
+        width: 100%;
+        max-width: $container;
+        gap: 100px;
+    }
+    &__left {
+        padding: 14px 0 0;
+    }
+    &__title {
+        font-size: 22px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 26px;
+    }
+    &__subtitle {
+        margin: 8px 0 0;
+        text-align: center;
+        color:$secondary;
+        line-height: 20px;
+    }
+    &__images {
+        padding: 32px 0 0;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        position: relative;
+        > img {
+            position: absolute;
+        }
+    }
+    &__phone {
+        &_1 {
+            transform: translateX(-42%);
+            z-index: 1;
+        }
+        &_2 {
+            z-index: 2;
+            transform: translateX(42%);
+        }
+    }
+    &__right {
+        min-width: 320px;
+        max-width: 320px;
+    }
+    &__login {
+        width: 100%;
+        padding: 25px;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    &__register {
+        width: 100%;
+        margin: 18px 0 0;
+        padding: 25px;
+        border-radius: 4px;
+        background-color: white;
+    }
+}
