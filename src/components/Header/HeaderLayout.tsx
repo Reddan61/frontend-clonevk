@@ -1,12 +1,13 @@
 import React from "react"
+import { Outlet } from "react-router-dom"
 import Header from "./Header"
 
 
-const HeaderLayout:React.FC = ({children}) => {
+const HeaderLayout:React.FC = () => {
     return <>
         <Header />
         <div>
-            {children}
+            <Outlet />
         </div>
     </>
 }

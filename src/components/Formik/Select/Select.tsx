@@ -13,8 +13,8 @@ const Select:React.FC<FieldProps<any> & IProps> = ({
     children,
     ...props
 }) => {
-    return <div className = {`${className} ${classes.select}`}>
-        <select required {...field} {...props}>
+    return <div className = {`${className} ${classes.select} ${!field.value && classes.select_null}`}>
+        <select {...field} {...props}>
             {children}
         </select>
     </div>

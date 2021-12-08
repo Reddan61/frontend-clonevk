@@ -1,0 +1,97 @@
+@import "@/_vars.scss";
+$background:#edeef0;
+
+
+.email {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    min-height: calc(100vh - 46px);
+    background-color: $background;
+    padding: 18px 0 0;
+    &__container {
+        width: 100%;
+        max-width: $container;
+        display: flex;
+        justify-content: center;
+    }
+    &__block {
+        width: 370px;
+        padding: 28px;
+    }
+    &__left {
+        background-color: #f7f8fa;
+    }
+    &__right {
+        background-color: white;
+    }
+    &__next {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        button {
+            width: 280px;
+            padding: 7px 3px 8px;
+            background-color: #5181B8;
+            color:white;
+            border-radius: 3px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+    }
+}
+
+.left {
+    height: 633px;
+    &__title {
+        font-size: 18px;
+        line-height: 25px;
+        margin: 14px 0 0;
+    }
+}
+
+.right {
+    height: 633px;
+    display: flex;
+    flex-direction: column;
+    &__title {
+        font-size: 20px;
+        text-align: center;
+    }
+    &__subTitle {
+        text-align: center;
+        margin: 13px 0 0;
+        font-size: 14px;
+        line-height: 22px;
+        color:$secondary;
+    }
+    &__forms {
+        margin: 0 10px 0;
+        flex: 1 1 auto;
+    }
+}
+
+.card {
+    margin: 24px 0 0;
+    width: 100%;
+    font-size: 14px;
+    display: flex;
+    &__text {
+        margin: 0 0 0 15px;
+        line-height: 22px;
+        color:$secondary;
+    }
+}
+
+.form {
+    &__text {
+        margin: 22px 0 0;
+        line-height: 19px;
+        font-weight: 500;
+        color:#333333;
+        font-size: 13px;
+    }
+    &__email {
+        margin: 12px 0 0;
+    }
+}

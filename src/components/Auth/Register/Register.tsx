@@ -1,15 +1,18 @@
 import React from "react"
-import Input from "@/components/Formik/Input/Input"
 import { Field, Form, Formik } from "formik"
+import { useNavigate } from "react-router-dom"
+import Input from "@/components/Formik/Input/Input"
 import classes from "./Register.module.scss"
 import Select from "@/components/Formik/Select/Select"
 
 
 
 const Register:React.FC = () => {
+    const navigate = useNavigate()
+
     const month = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
     const submit = () => {
-        console.log("register submit")
+        navigate("/auth/email")
     }
     function getDayCount() {
         const arr = []
