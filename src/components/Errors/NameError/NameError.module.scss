@@ -1,0 +1,51 @@
+$backgroundcolor:#ca635f;
+
+.error {
+    z-index: 100;
+    position:absolute;
+    display: flex;
+    pointer-events: none;
+    color:white;
+    align-items: center;
+    transform: translate(-105%);
+    &__wrapped {
+        max-width: 320px;
+        border-radius: 2px;
+        font-size: 12.5px;
+        border: 1px solid #ad4547;
+        background-color: $backgroundcolor;
+        padding: 16px 15px 17px;
+        line-height: 17px;
+    }
+    &__title {
+        font-weight: 700;
+    }
+    &__text {
+        margin: 6px 0 0;
+    }
+    &__arrow {
+        width: 0;
+        height: 0;
+        border-top: 7px solid transparent;
+        border-bottom: 7px solid transparent;
+        border-left: 7px solid $backgroundcolor;
+    }
+}
+
+
+.animation {
+    &__enter {
+        opacity: 0;
+        &_active {
+            transition: opacity .3s linear 0s;
+            opacity: 1;
+        }
+    }
+    &__exit {
+        opacity: 1;
+        &_active {
+            transition: opacity .3s linear 0s;
+            opacity: 0;
+        }
+    }
+}

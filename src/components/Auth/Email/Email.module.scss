@@ -94,4 +94,33 @@ $background:#edeef0;
     &__email {
         margin: 12px 0 0;
     }
+    &__code {
+        margin: 12px 0 0;
+    }
+    &__password {
+        margin: 12px 0 0;
+    }
+    &__error {
+        color:#656565;
+        font-size: 12.5px;
+        margin: 7px 0 0;
+    }
+}
+
+.error {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 13px;
+    padding: 20px 0 0;
+    &__wrapped {
+        padding: 7px 9px 18px;
+        display: flex;
+        background-color: rgba($color: red, $alpha: 0.1);
+        border-radius: 4px;
+    }
+    &__text {
+        line-height: 150%;
+        margin: 2px 0 0 5px;
+    }
 }

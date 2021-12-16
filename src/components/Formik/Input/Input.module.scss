@@ -1,7 +1,29 @@
 @import "@/_vars.scss";
 
+@keyframes errorAnimation {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.15;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
 .input {
     width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &_disabled {
+        > input {
+            background-color:#F0F2F5 !important;
+            color:#818C99 !important;
+        }
+    }
     > input {
         width: 100%;
         font-size: 14px;
@@ -16,6 +38,18 @@
         }
         &:focus::placeholder {
             color:$input_placeholder_focus;
+        }
+    }
+    &__error {
+        pointer-events: none;
+        position: absolute;
+        width: calc(100%);
+        height: calc(100% - 2px);
+        border-radius: 3px;
+        background-color: red;
+        opacity: 0;
+        &_active {
+            animation: errorAnimation 1s linear 0s 1;
         }
     }
 }

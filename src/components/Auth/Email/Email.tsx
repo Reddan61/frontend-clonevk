@@ -1,26 +1,47 @@
-import Button from "@/components/Formik/Button/Button"
 import Input from "@/components/Formik/Input/Input"
 import Key from "@/components/svg/Key"
 import LogoID from "@/components/svg/LogoID"
 import Phone from "@/components/svg/Phone"
 import Profile from "@/components/svg/Profile"
-import { Field, Form, Formik } from "formik"
+import Error from "@/components/svg/Error"
+import { Field, Form, Formik, FormikHelpers } from "formik"
 import React, { useRef, useState } from "react"
 import { Navigate } from "react-router-dom"
 import classes from "./Email.module.scss"
+import { CodeSchema, EmailSchema, PasswordSchema } from "./Email.schema"
 
 const Email:React.FC = () => {
     const isRegistered = true
-    const [isSubmittedFirst,setSubmittedFirst] = useState(false)
+    const [submitedEmail,setSubmitEmail] = useState(false)
+    const [submitedCode,setSubmitCode] = useState(false)
+    const [emailError,setEmailError] = useState(false)
     const firstForm = useRef<any>()
     const secondForm = useRef<any>()
+    const thirdForm = useRef<any>()
 
-    const sendEmail = () => {
-        console.log("send email")
-        setSubmittedFirst(true)
+    const sendEmail = async (values:any) => {
+        try {
+            const validateResult = await EmailSchema.validate(values,{ abortEarly: false })
+
+            setSubmitEmail(true)
+        } catch(validationError:any) {
+            setEmailError(true)
+        }
     }
-    const sendCode = () => {
-        console.log("send code")
+    const sendCode = async (values:any,{setFieldError}:FormikHelpers<any>) => {
+        try {
+            const validateResult = await CodeSchema.validate(values,{ abortEarly: false })
+
+            setSubmitCode(true)
+        } catch(validationError:any) {
+            const fieldError = validationError.inner[0]?.path 
+            const messageError = validationError.inner[0]?.message
+ 
+            setFieldError(fieldError,messageError)
+        }
+    }
+    const sendPassword = async (values:any,{setFieldError}:FormikHelpers<any>) => {
+        console.log("everything submitted")
     }
 
     if(!isRegistered)
@@ -65,16 +86,26 @@ const Email:React.FC = () => {
                     Ваш адрес электронной почты  будет
                     использоваться для входа в аккаунт
                 </div>
+                {emailError && <div className={classes.error}>
+                    <div className={classes.error__wrapped}>
+                        <Error />
+                        <div className={classes.error__text}>
+                            <b>Неверный адрес почты.</b>
+                            <br />
+                            Пример: Test@ya.ru
+                        </div>
+                    </div>
+                </div>}
                 <div className = {classes.right__forms}>
                     <Formik
                         innerRef = {firstForm}
                         initialValues = {{email:""}}
                         onSubmit = {sendEmail}
                     >
-                        {() => (
+                        {({errors,touched}) => (
                             <Form>
                                 <div className = {classes.form__text}>Адрес электронной почты</div>
-                                <Field className = {classes.form__email} name = "email" component = {Input} placeholder = {"Ваша фамилия"}/>
+                                <Field className = {classes.form__email} name = "email" component = {Input} placeholder = {"Email"} disabled = {submitedEmail}/>
                             </Form>
                         )}
                     </Formik>
@@ -83,24 +114,51 @@ const Email:React.FC = () => {
                         initialValues = {{code:""}}
                         onSubmit = {sendCode}
                     >
-                        {() => (
+                        {({errors,touched}) => (
                             <Form>
-                                {isSubmittedFirst && <>
+                                {submitedEmail && <>
                                     <div className = {classes.form__text}>Подтверждение адреса почты</div>
-                                    <Field className = {classes.form__code} name = "code" component = {Input} placeholder = {"Код из письма"}/>
+                                    <Field className = {classes.form__code} name = "code" 
+                                        component = {Input} placeholder = {"Код из письма"}
+                                        isError = {Boolean(errors.code && touched.code)}
+                                        disabled = {submitedCode}
+                                    />
+                                </>}
+                            </Form>
+                        )}
+                    </Formik>
+                    <Formik
+                        innerRef = {thirdForm}
+                        initialValues = {{password:""}}
+                        onSubmit = {sendPassword}
+                        validationSchema={PasswordSchema}
+                    >
+                        {({errors,touched}) => (
+                            <Form>
+                                {submitedCode && <>
+                                    <div className = {classes.form__text}>Подтверждение адреса почты</div>
+                                    <Field className = {classes.form__password} name = "password" 
+                                        component = {Input} placeholder = {"Введите пароль"}
+                                    />
+                                    {Boolean(errors.password) &&
+                                        <div className={classes.form__error}>{errors.password}</div>
+                                    }
                                 </>}
                             </Form>
                         )}
                     </Formik>
                 </div>
                 <div className = {classes.email__next}>
-                    <button onClick = {() => {
-                        if(!isSubmittedFirst) {
+                    <button type="submit" onClick = {(e) => {
+                        e.preventDefault()
+                        if(!submitedEmail) {
                             firstForm.current.handleSubmit()
+                        } else if(submitedCode) {
+                            thirdForm.current.handleSubmit()
                         } else {
                             secondForm.current.handleSubmit()
                         }
-                    }}>Далее</button>
+                    }}>{submitedCode ? "Войти на сайт" :"Далее"}</button>
                 </div>
             </div>
         </div>

@@ -8,6 +8,13 @@
         font-size: 20px;
         line-height: 24px;
     }
+    &__field {
+        display: flex;
+        align-items: center;
+        &_surname {
+            margin: 11px 0 0;
+        }
+    }
     &__subtitle {
         font-size: 13px;
         line-height: 16px;
@@ -15,9 +22,6 @@
         text-align: center;
         color:$secondary;
         margin: 2px 0 26px;
-    }
-    &__surname {
-        margin: 11px 0 0;
     }
     &__dateInfo {
         display: block;

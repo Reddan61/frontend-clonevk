@@ -1,18 +1,28 @@
 import React from "react"
-import { Field, Form, Formik } from "formik"
+import { Field, Form, Formik, FormikHelpers } from "formik"
 import { useNavigate } from "react-router-dom"
 import Input from "@/components/Formik/Input/Input"
 import classes from "./Register.module.scss"
 import Select from "@/components/Formik/Select/Select"
+import { RegisterShema } from "./Register.schema"
+import NameErrorMessage from "@/components/Errors/NameError/NameError"
 
 
 
 const Register:React.FC = () => {
     const navigate = useNavigate()
-
     const month = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
-    const submit = () => {
-        navigate("/auth/email")
+    const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
+        try {
+            const validateResult = await RegisterShema.validate(values,{ abortEarly: false })
+
+            navigate("/auth/email")
+        } catch(validationError:any) {
+            const fieldError = validationError.inner[0]?.path 
+            const messageError = validationError.inner[0]?.message
+ 
+            setFieldError(fieldError,messageError)
+        }
     }
     function getDayCount() {
         const arr = []
@@ -37,27 +47,44 @@ const Register:React.FC = () => {
         initialValues = {{firstName:"",surname:"",day:"",month:"",year:""}}
         onSubmit = {submit}
     >
-        {() => (
+        {({errors, touched}) => (
             <Form>
                 <span className = {classes.register__title}>Впервые ВКонтакте?</span>
                 <span className = {classes.register__subtitle}>Моментальная регистрация</span>
-                <Field className = {classes.register__firstname} name = "firstName" component = {Input} placeholder = {"Ваше имя"}/>
-                <Field className = {classes.register__surname} name = "surname" component = {Input} placeholder = {"Ваша фамилия"}/>
+                <div className = {classes.register__field}>
+                    <Field className = {classes.register__firstname} 
+                        name = "firstName" component = {Input} placeholder = {"Ваше имя"}
+                        isError = {Boolean(errors.firstName && touched.firstName)}
+                    />
+                    <NameErrorMessage isShow = {Boolean(errors.firstName && touched.firstName)}/>
+                </div>
+                <div className = {`${classes.register__field} ${classes.register__field_surname}`}>
+                    <Field className = {classes.register__surname} name = "surname" component = {Input} placeholder = {"Ваша фамилия"}
+                        isError = {Boolean(errors.surname && touched.surname)}
+                    />
+                    <NameErrorMessage isShow = {Boolean(errors.surname && touched.surname)}/>
+                </div>
                 <span className = {classes.register__dateInfo}>Дата рождения</span>
                 <div className = {classes.register__date}>
-                    <Field className = {classes.register__day} name = "day" component = {Select}>
+                    <Field className = {classes.register__day} name = "day" component = {Select}
+                        isError = {Boolean(errors.day && touched.day)}
+                    >
                         <option value = "">День</option>
                         {getDayCount().map(el => {
                             return <option value = {el+1} key = {el}>{el}</option>
                         })}
                     </Field>
-                    <Field className = {classes.register__month} name = "month" component = {Select}>
+                    <Field className = {classes.register__month} name = "month" component = {Select}
+                        isError = {Boolean(errors.month && touched.month)}
+                    >
                         <option value = "">Месяц</option>
                         {month.map(el => {
                             return <option value = {el} key = {el}>{el}</option>
                         })}
                     </Field>
-                    <Field className = {classes.register__year} name = "year" component = {Select}>
+                    <Field className = {classes.register__year} name = "year" component = {Select}
+                        isError = {Boolean(errors.year && touched.year)}
+                    >
                         <option value = "">Год</option>
                         {getYears().map(el => {
                             return <option value = {el} key = {el}>{el}</option>

@@ -18,6 +18,7 @@ export default {
     output: {
         path: path.resolve(__dirname, './dist'),
         filename: '[name].bundle.js',
+        publicPath: '/'
     },
     resolve: {
         extensions:[".tsx",".json",".ts",".js",".jsx"],
