@@ -19,7 +19,7 @@ const Input:React.FC<FieldProps<any> & IProps> = ({
     const isAnimationEndRef = useRef(true)
 
     return <div className = {`${classes.input} ${className} ${disabled && classes.input_disabled}`}>
-          <ErrorDivProps 
+          <ErrorDiv 
             error = {isError} 
             isAnimationEndRef = {isAnimationEndRef}
           />
@@ -32,7 +32,7 @@ interface IErrorDivProps {
     isAnimationEndRef:{current:boolean}
 }
 
-const ErrorDivProps:React.FC<IErrorDivProps> = React.memo(({error,isAnimationEndRef}) => {
+const ErrorDiv:React.FC<IErrorDivProps> = React.memo(({error,isAnimationEndRef}) => {
     const divRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {

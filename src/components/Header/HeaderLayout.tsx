@@ -6,7 +6,9 @@ import Header from "./Header"
 const HeaderLayout:React.FC = () => {
     return <>
         <Header />
-        <div>
+        <div style={{
+            minHeight: "calc(100vh - 46px)"
+        }}>
             <Outlet />
         </div>
     </>

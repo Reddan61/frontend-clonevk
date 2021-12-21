@@ -1,39 +1,32 @@
-import React from "react"
-import { Field, Formik, Form, FormikHelpers } from "formik"
-import Input from "@/components/Formik/Input/Input"
+import React, { useState } from "react"
+import LoginForm from "../LoginForm/LoginForm"
 import classes from "./Login.module.scss"
-import { LoginSchema } from "./Login.schema"
 
 const Login:React.FC = () => {
-    const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
-        const validateResult = await LoginSchema.validate(values,{ abortEarly: false })
-        .catch((err) => {
-            return err
-        })
-        const fieldError = validateResult.inner[0]?.path 
-        const messageError = validateResult.inner[0]?.message
-        if(fieldError && messageError) 
-            setFieldError(fieldError,messageError)
-    }
+    const [isError,setError] = useState(false)
 
-    return <Formik
-        initialValues = {{email:"",password:""}}
-        onSubmit = {submit}
-    >
-        {({errors, touched}) => (
-            <Form>
-                <Field className = {classes.login__email} name = "email"
-                    component = {Input} placeholder = {"Email"}
-                    isError = {Boolean(errors.email && touched.email)}
-                />
-                <Field className = {classes.login__password} name = "password" 
-                    component = {Input} placeholder = {"Пароль"}
-                    isError = {Boolean(errors.password && touched.password)}
-                />
-                <button className = {classes.login__submit} type = "submit">Войти</button>
-            </Form>
-        )}
-    </Formik>
+    return <div className={classes.login}>
+        <div className={classes.login__wrapped}>
+            <div className={classes.login__title}>
+                Вход ВКонтакте
+            </div>
+            {
+                isError && 
+                <div className={classes.login__error}>
+                    <b>Не удаётся войти.</b><br />
+                    Пожалуйста, проверьте правильность написания <b>логина</b> и <b>пароля</b>. 
+                    <ul>
+                        <li>Возможно, нажата клавиша <b>Caps Lock</b>?</li>
+                        <li>Может быть, у Вас включена неправильная <b>раскладка</b>? (русская или английская)</li>
+                        <li>Попробуйте набрать свой пароль в текстовом редакторе и <b>скопировать</b> в графу «Пароль»</li>
+                    </ul>
+                </div>
+            }
+            <div className={classes.login__form}>
+                <LoginForm withRegisterButton = {true}/>
+            </div>
+        </div>
+    </div>
 }
 
 

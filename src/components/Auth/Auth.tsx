@@ -2,7 +2,7 @@ import React from "react"
 import classes from "./Auth.module.scss"
 import phone1 from "@/images/phone1.png"
 import phone2 from "@/images/phone2.png"
-import Login from "./Login/Login"
+import LoginForm from "./LoginForm/LoginForm"
 import Register from "./Register/Register"
 
 const Auth:React.FC = () => {
@@ -20,7 +20,7 @@ const Auth:React.FC = () => {
             </div>
             <div className = {classes.auth__right}>
                 <div className = {classes.auth__login}>
-                    <Login />
+                    <LoginForm />
                 </div>
                 <div className = {classes.auth__register}>
                     <Register />

@@ -17,7 +17,7 @@ const Select:React.FC<FieldProps<any> & IProps> = ({
 }) => {
     const isAnimationEndRef = useRef(true)
     return <div className = {`${className} ${classes.select} ${!field.value && classes.select_null}`}>
-        <ErrorDivProps error = {isError} isAnimationEndRef = {isAnimationEndRef}/>
+        <ErrorDiv error = {isError} isAnimationEndRef = {isAnimationEndRef}/>
         <select {...field} {...props}>
             {children}
         </select>
@@ -29,7 +29,7 @@ interface IErrorDivProps {
     isAnimationEndRef:{current:boolean}
 }
 
-const ErrorDivProps:React.FC<IErrorDivProps> = React.memo(({error,isAnimationEndRef}) => {
+const ErrorDiv:React.FC<IErrorDivProps> = React.memo(({error,isAnimationEndRef}) => {
     const divRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
