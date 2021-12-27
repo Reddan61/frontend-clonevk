@@ -1,9 +1,14 @@
 import path from "path"
 import { fileURLToPath } from 'url'
 import webpack from "webpack"
+import dotenv from "dotenv"
 //plugins
 import HtmlWebpackPlugin from "html-webpack-plugin"
 import { CleanWebpackPlugin }from "clean-webpack-plugin"
+
+dotenv.config({
+    path: "./.env"
+})
 
 
 const __filename = fileURLToPath(import.meta.url)
@@ -45,7 +50,10 @@ export default {
             filename: 'index.html', // название выходного файла
         }),
         new CleanWebpackPlugin(),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.DefinePlugin({
+            "process.env": JSON.stringify(process.env)
+        })
     ],
     module: {
         rules: [

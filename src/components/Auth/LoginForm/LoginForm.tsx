@@ -4,31 +4,50 @@ import Input from "@/components/Formik/Input/Input"
 import classes from "./LoginForm.module.scss"
 import { LoginSchema } from "./Login.schema"
 import { useNavigate } from "react-router"
+import { AuthApi, ILoginPayload } from "@/Api/auth"
 
 interface IProps {
-    withRegisterButton?:boolean
+    withRegisterButton?:boolean,
+    setError?: (bool:boolean) => void
 }
 
 
-const LoginForm:React.FC<IProps> = ({withRegisterButton}) => {
+const LoginForm:React.FC<IProps> = ({withRegisterButton, setError}) => {
     const navigate = useNavigate()
 
     const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
-        const validateResult = await LoginSchema.validate(values,{ abortEarly: false })
-        .catch((err) => {
-            return err
-        })
-        const fieldError = validateResult.inner[0]?.path 
-        const messageError = validateResult.inner[0]?.message
-        if(fieldError && messageError) 
-            setFieldError(fieldError,messageError)
+        try {
+            const validateResult = await LoginSchema.validate(values,{ abortEarly: false })
+            
+            const payload:ILoginPayload = {
+                email:values.email,
+                password:values.password
+            }
 
-        //При серверной ошибке navigate("auth/login")
+            const response = await AuthApi.login(payload)
+            
+            if(response.message !== "success") {
+                if(setError) {
+                    setError(true)
+                }
+                return
+            }
+
+            localStorage.setItem("vk-clone-token",response.payload.token)
+
+            navigate("/profile",{replace:true})
+        } catch(e:any) {
+            const fieldError = e.inner[0]?.path 
+            const messageError = e.inner[0]?.message
+            if(fieldError && messageError) 
+                setFieldError(fieldError,messageError)
+        }
     }
 
     const redirectToRegister = () => {
-        navigate("../../auth")
+        navigate("/auth",{replace:true})
     }
+
     return <Formik
         initialValues = {{email:"",password:""}}
         onSubmit = {submit}
@@ -41,6 +60,7 @@ const LoginForm:React.FC<IProps> = ({withRegisterButton}) => {
                 />
                 <Field className = {classes.login__password} name = "password" 
                     component = {Input} placeholder = {"Пароль"}
+                    type = {"password"}
                     isError = {Boolean(errors.password && touched.password)}
                 />
                 <div  className = {classes.login__buttons}>

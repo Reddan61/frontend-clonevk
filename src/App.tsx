@@ -12,6 +12,9 @@ const App:React.FC = () => {
             <Route path = "email" element = {<Email/>} />
             <Route path = "login" element = {<Login/>} />
         </Route>
+        <Route path = "profile" element = {<HeaderLayout />}>
+            <Route index element = {<div>Profile Page</div>} /> 
+        </Route>
     </Routes>
 }
 

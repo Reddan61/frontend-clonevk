@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import withNonAuth from "@/components/HOCs/withNonAuth"
 import LoginForm from "../LoginForm/LoginForm"
 import classes from "./Login.module.scss"
 
@@ -23,11 +24,11 @@ const Login:React.FC = () => {
                 </div>
             }
             <div className={classes.login__form}>
-                <LoginForm withRegisterButton = {true}/>
+                <LoginForm withRegisterButton = {true} setError={setError}/>
             </div>
         </div>
     </div>
 }
 
 
-export default Login
+export default withNonAuth(Login)

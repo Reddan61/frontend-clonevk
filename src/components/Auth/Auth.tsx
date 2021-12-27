@@ -4,6 +4,7 @@ import phone1 from "@/images/phone1.png"
 import phone2 from "@/images/phone2.png"
 import LoginForm from "./LoginForm/LoginForm"
 import Register from "./Register/Register"
+import withNonAuth from "../HOCs/withNonAuth"
 
 const Auth:React.FC = () => {
     return <div className = {classes.auth}>
@@ -31,4 +32,4 @@ const Auth:React.FC = () => {
 }
 
 
-export default Auth
+export default withNonAuth(Auth)

@@ -6,15 +6,24 @@ import Profile from "@/components/svg/Profile"
 import Error from "@/components/svg/Error"
 import { Field, Form, Formik, FormikHelpers } from "formik"
 import React, { useRef, useState } from "react"
-import { Navigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import classes from "./Email.module.scss"
 import { CodeSchema, EmailSchema, PasswordSchema } from "./Email.schema"
+import { AuthApi, ISendEmailPayload, ISetPasswordPayload, IVerifyEmailPayload } from "@/Api/auth"
+import { useAppDispatch, useAppSelector } from "@/store/store"
+import withRegisterId from "@/components/HOCs/withRegisterId"
+import { registerActions } from "@/store/RegisterReducer"
+import withNonAuth from "@/components/HOCs/withNonAuth"
 
 const Email:React.FC = () => {
-    const isRegistered = true
+    const navigate = useNavigate()
+    const dispatch = useAppDispatch()
     const [submitedEmail,setSubmitEmail] = useState(false)
     const [submitedCode,setSubmitCode] = useState(false)
     const [emailError,setEmailError] = useState(false)
+
+    const registeredId = useAppSelector(state => state.register._id)
+
     const firstForm = useRef<any>()
     const secondForm = useRef<any>()
     const thirdForm = useRef<any>()
@@ -22,8 +31,19 @@ const Email:React.FC = () => {
     const sendEmail = async (values:any) => {
         try {
             const validateResult = await EmailSchema.validate(values,{ abortEarly: false })
+            const payload:ISendEmailPayload = {
+                _id:registeredId || "",
+                email:values.email
+            }
+            
+            const response = await AuthApi.sendEmail(payload)
 
-            setSubmitEmail(true)
+            if(response.message === "success") {
+                setSubmitEmail(true)
+                return
+            }
+
+            alert("Что-то пошло не так!")
         } catch(validationError:any) {
             setEmailError(true)
         }
@@ -31,21 +51,41 @@ const Email:React.FC = () => {
     const sendCode = async (values:any,{setFieldError}:FormikHelpers<any>) => {
         try {
             const validateResult = await CodeSchema.validate(values,{ abortEarly: false })
+            const payload:IVerifyEmailPayload = {
+                _id:registeredId,
+                code:values.code
+            }
 
-            setSubmitCode(true)
+            const response = await AuthApi.verifyEmail(payload)
+
+            if(response.message === "success") {
+                setSubmitCode(true)
+                return
+            }
+            //throw error
+            await CodeSchema.validate({code:"1"},{ abortEarly: false })
+
         } catch(validationError:any) {
             const fieldError = validationError.inner[0]?.path 
             const messageError = validationError.inner[0]?.message
- 
+            
             setFieldError(fieldError,messageError)
         }
     }
     const sendPassword = async (values:any,{setFieldError}:FormikHelpers<any>) => {
-        console.log("everything submitted")
+        const payload:ISetPasswordPayload = {
+            _id:registeredId || "",
+            password:values.password
+        }
+        
+        const response = await AuthApi.setPassword(payload)
+
+        if(response.message === "success") {
+            navigate("/auth/login",{replace:true})
+            dispatch(registerActions.setIdAC(null))
+        }
     }
 
-    if(!isRegistered)
-        return <Navigate to = "/auth"></Navigate>
     return <div className = {classes.email}>
         <div className = {classes.email__container}>
             <div className = {`${classes.email__block} ${classes.email__left} ${classes.left}`}>
@@ -136,7 +176,7 @@ const Email:React.FC = () => {
                         {({errors,touched}) => (
                             <Form>
                                 {submitedCode && <>
-                                    <div className = {classes.form__text}>Подтверждение адреса почты</div>
+                                    <div className = {classes.form__text}>Пароль</div>
                                     <Field className = {classes.form__password} name = "password" 
                                         component = {Input} placeholder = {"Введите пароль"}
                                     />
@@ -158,7 +198,7 @@ const Email:React.FC = () => {
                         } else {
                             secondForm.current.handleSubmit()
                         }
-                    }}>{submitedCode ? "Войти на сайт" :"Далее"}</button>
+                    }}>Далее</button>
                 </div>
             </div>
         </div>
@@ -166,4 +206,5 @@ const Email:React.FC = () => {
 }
 
 
-export default Email
+
+export default withNonAuth(withRegisterId(Email))

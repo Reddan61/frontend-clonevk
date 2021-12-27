@@ -6,20 +6,47 @@ import classes from "./Register.module.scss"
 import Select from "@/components/Formik/Select/Select"
 import { RegisterShema } from "./Register.schema"
 import NameErrorMessage from "@/components/Errors/NameError/NameError"
+import { AuthApi, IPreRegisterPayload } from "@/Api/auth"
+import { useAppDispatch } from "@/store/store"
+import { registerActions } from "@/store/RegisterReducer"
 
 
 
 const Register:React.FC = () => {
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const month = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
     const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
         try {
             const validateResult = await RegisterShema.validate(values,{ abortEarly: false })
 
+            const payload:IPreRegisterPayload = {
+                firstName: values.firstName,
+                surname:values.surname,
+                birthday: {
+                    day:values.day,
+                    month:values.month,
+                    year:values.year
+                }
+            }
+
+            const response = await AuthApi.preRegister(payload)
+
+            if(response.message !== "success") {
+                throw new Error("customError")
+            }
+            
+            dispatch(registerActions.setIdAC(response.payload.user._id))
+
             navigate("/auth/email")
-        } catch(validationError:any) {
-            const fieldError = validationError.inner[0]?.path 
-            const messageError = validationError.inner[0]?.message
+        } catch(error:any) {
+            if(error.message === "customError") {
+                alert("Что-то пошло не так!")
+                return
+            }
+
+            const fieldError = error.inner[0]?.path 
+            const messageError = error.inner[0]?.message
  
             setFieldError(fieldError,messageError)
         }
@@ -78,8 +105,8 @@ const Register:React.FC = () => {
                         isError = {Boolean(errors.month && touched.month)}
                     >
                         <option value = "">Месяц</option>
-                        {month.map(el => {
-                            return <option value = {el} key = {el}>{el}</option>
+                        {month.map((el,index) => {
+                            return <option value = {index} key = {el}>{el}</option>
                         })}
                     </Field>
                     <Field className = {classes.register__year} name = "year" component = {Select}
