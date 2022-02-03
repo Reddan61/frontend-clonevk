@@ -1,0 +1,16 @@
+.sidebar {
+    font-size: 13px;
+    ul {
+        li {
+            padding: 5px 6px;
+            display: flex;
+            align-items: center;
+            gap:10px;
+            cursor: pointer;
+            transition: all .3s linear 0s;
+            &:hover {
+                background-color: #e5e7ea;
+            }
+        }
+    }
+}

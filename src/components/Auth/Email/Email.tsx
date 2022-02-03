@@ -95,7 +95,7 @@ const Email:React.FC = () => {
                 </h2>
                 <div className = {classes.card}>
                     <div className = {classes.card__svg}>
-                        <Profile />
+                        <Profile width={24} height={24} color="#6F7985"/>
                     </div>
                     <div className = {classes.card__text}>
                         Создайте аккаунт ВКонтакте и используйте его для входа в другие сервисы

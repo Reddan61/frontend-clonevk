@@ -1,7 +1,9 @@
 import React from "react"
+import IProps from "./SvgInterface"
 
-const Profile:React.FC = () => {
-    return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path d="M12 0c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0zm0 18.5c-2.086 0-4.08.582-5.797 1.649A9.951 9.951 0 0012 22c2.16 0 4.161-.685 5.796-1.85A10.938 10.938 0 0012 18.5zM12 2C6.477 2 2 6.477 2 12a9.964 9.964 0 002.648 6.779A12.934 12.934 0 0112 16.5c2.67 0 5.215.808 7.353 2.277A9.963 9.963 0 0022 12c0-5.523-4.477-10-10-10zm0 3.5a4.749 4.749 0 014.75 4.75A4.749 4.749 0 0112 15a4.749 4.749 0 01-4.75-4.75A4.749 4.749 0 0112 5.5zm0 2c-1.52 0-2.75 1.23-2.75 2.75S10.48 13 12 13s2.75-1.23 2.75-2.75S13.52 7.5 12 7.5z" fill="#6F7985"/></svg>
+const Profile:React.FC<IProps> = ({height,width,color}) => {
+    return <svg fill="none"  width={`${width}`}
+    height={`${height}`}  viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clipRule="evenodd" d="M5.84 15.63a6.97 6.97 0 008.32 0 8.2 8.2 0 00-8.32 0zM4.7 14.57a7 7 0 1110.6 0 9.7 9.7 0 00-10.6 0zM10 1.5a8.5 8.5 0 100 17 8.5 8.5 0 000-17zm-1.5 7a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0zm1.5-3a3 3 0 100 6 3 3 0 000-6z" fill={`${color}`} fillRule="evenodd"></path></svg>
 }
 
 export default Profile

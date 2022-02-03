@@ -1,9 +1,10 @@
 import React from "react"
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from "react-router-dom"
 import Auth from "@/components/Auth/Auth"
 import HeaderLayout from "@/components/Header/HeaderLayout"
 import Email from "@/components/Auth/Email/Email"
 import Login from "@/components/Auth/Login/Login"
+import Profile from "./components/Profile/Profile"
 
 const App:React.FC = () => {
     return <Routes>
@@ -13,8 +14,9 @@ const App:React.FC = () => {
             <Route path = "login" element = {<Login/>} />
         </Route>
         <Route path = "profile" element = {<HeaderLayout />}>
-            <Route index element = {<div>Profile Page</div>} /> 
+            <Route index element = {<Profile />} /> 
         </Route>
+        <Route path="*" element={<Navigate to={"/auth"} replace/>} />
     </Routes>
 }
 

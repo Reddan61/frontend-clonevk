@@ -1,10 +1,49 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router"
+import { FormikHelpers } from "formik"
 import withNonAuth from "@/components/HOCs/withNonAuth"
 import LoginForm from "../LoginForm/LoginForm"
 import classes from "./Login.module.scss"
+import { LoginSchema } from "../LoginForm/Login.schema"
+import { AuthApi, ILoginPayload } from "@/Api/auth"
+import { useAppDispatch } from "@/store/store"
+import { loginActions } from "@/store/LoginReducer"
 
 const Login:React.FC = () => {
     const [isError,setError] = useState(false)
+
+    const dispatch = useAppDispatch()
+    const navigate = useNavigate()
+
+    const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
+        try {
+            const validateResult = await LoginSchema.validate(values,{ abortEarly: false })
+            
+            const payload:ILoginPayload = {
+                email:values.email,
+                password:values.password
+            }
+
+            const response = await AuthApi.login(payload)
+            
+
+            if(response.message !== "success") {
+                if(setError) {
+                    setError(true)
+                }
+                return
+            }
+
+            localStorage.setItem("vk-clone-token",response.payload.token)
+            
+            navigate("/profile",{replace:true})
+        } catch(e:any) {
+            const fieldError = e.inner[0]?.path 
+            const messageError = e.inner[0]?.message
+            if(fieldError && messageError) 
+                setFieldError(fieldError,messageError)
+        }
+    }
 
     return <div className={classes.login}>
         <div className={classes.login__wrapped}>
@@ -24,7 +63,7 @@ const Login:React.FC = () => {
                 </div>
             }
             <div className={classes.login__form}>
-                <LoginForm withRegisterButton = {true} setError={setError}/>
+                <LoginForm submit={submit} withRegisterButton = {true} setError={setError}/>
             </div>
         </div>
     </div>

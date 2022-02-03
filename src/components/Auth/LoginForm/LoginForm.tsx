@@ -1,52 +1,34 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Field, Formik, Form, FormikHelpers } from "formik"
 import Input from "@/components/Formik/Input/Input"
 import classes from "./LoginForm.module.scss"
 import { LoginSchema } from "./Login.schema"
-import { useNavigate } from "react-router"
+import { useNavigate, useParams } from "react-router"
 import { AuthApi, ILoginPayload } from "@/Api/auth"
+import { useSearchParams } from "react-router-dom"
 
 interface IProps {
     withRegisterButton?:boolean,
-    setError?: (bool:boolean) => void
+    setError?: (bool:boolean) => void,
+    submit: (values:any,{}:FormikHelpers<any>) => void
 }
 
 
-const LoginForm:React.FC<IProps> = ({withRegisterButton, setError}) => {
+const LoginForm:React.FC<IProps> = ({withRegisterButton, setError, submit}) => {
     const navigate = useNavigate()
-
-    const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
-        try {
-            const validateResult = await LoginSchema.validate(values,{ abortEarly: false })
-            
-            const payload:ILoginPayload = {
-                email:values.email,
-                password:values.password
-            }
-
-            const response = await AuthApi.login(payload)
-            
-            if(response.message !== "success") {
-                if(setError) {
-                    setError(true)
-                }
-                return
-            }
-
-            localStorage.setItem("vk-clone-token",response.payload.token)
-
-            navigate("/profile",{replace:true})
-        } catch(e:any) {
-            const fieldError = e.inner[0]?.path 
-            const messageError = e.inner[0]?.message
-            if(fieldError && messageError) 
-                setFieldError(fieldError,messageError)
+    const  [query,setQuery] = useSearchParams()
+  
+    useEffect(() => {
+        if(query.get("error") && setError) {
+            setError(true)
         }
-    }
+    },[])
 
     const redirectToRegister = () => {
         navigate("/auth",{replace:true})
     }
+
+
 
     return <Formik
         initialValues = {{email:"",password:""}}
