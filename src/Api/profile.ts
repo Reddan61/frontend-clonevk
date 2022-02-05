@@ -66,7 +66,24 @@ export class ProfileApi {
         }
     }
 
-    
+    static async getProfileInfo(payload:{userId:string}):Promise<IApiResponse> {
+        try {
+            const response = await instance.get(`profile/info/${payload.userId}`)
+
+            return {
+                message:"success",
+                payload: {
+                    ...response.data.payload
+                }
+            }
+        }
+        catch(e:any) {
+            return {
+                message:"error",
+                payload: {}
+            }
+        }
+    }
 
 }
 

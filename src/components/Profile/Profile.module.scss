@@ -22,14 +22,16 @@
         display: flex;
         flex-direction: column;
     }
+    &__block {
+        border-radius: 4px;
+        box-shadow:  0 1px 0 0 #dce1e6, 0 0 0 1px #e7e8ec;
+        background-color: white;
+    }
 }
 
 .avatar {
     &__wrapped {     
-        background-color: white;
         padding: 15px 15px;
-        border-radius: 4px;
-        box-shadow:  0 1px 0 0 #dce1e6, 0 0 0 1px #e7e8ec;
     }
     &__photo {
         position: relative;
@@ -67,6 +69,49 @@
     }
 }
 
+
+.info {
+    &__wrapped {
+        padding: 15px 20px;
+        min-width: 550px;
+        max-width: 550px;
+    }
+    &__top {
+        padding: 0 0 15px;
+        border-bottom: 1px solid $input_border;
+    }
+    &__center {
+        padding: 10px 0 0;
+    }
+    &__list {
+        li {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            span:first-child {
+                display: block;
+                min-width: 165px;
+                max-width: 165px;
+                color:#818C99;
+                + span {
+                    color:#2a5885;
+                }
+            }
+        }
+    }
+    &__title {
+        overflow: hidden;
+        max-width: calc(550px - 40px - 40px);
+        text-overflow: ellipsis;
+        span {
+            font-size: 19px;
+            line-height: 25px;
+            font-weight: 400;
+            white-space: nowrap;
+        }
+    }
+    
+}
 
 .animation {
     &__enter {

@@ -9,6 +9,7 @@ import { userInfoActions } from "@/store/UserInfoReducer";
 import noImage from "@/images/noImage.png"
 import ArrowUp from "../svg/ArrowUp";
 import { CSSTransition } from "react-transition-group";
+import CustomDate from "@/utils/customDate";
 
 const Profile:React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -19,7 +20,7 @@ const Profile:React.FC = () => {
     const dispatch = useAppDispatch()
 
     const { userId } = useAppSelector(state => state.login)
-    const { avatar } = useAppSelector(state => state.userinfo)
+    const { avatar, firstName, birthday, surname } = useAppSelector(state => state.userinfo)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const nodeRef = useRef(null)
@@ -36,7 +37,17 @@ const Profile:React.FC = () => {
                 }
             }
         })()
-    },[])
+    },[searchParams.get("id")])
+
+    useEffect(() => {
+        (async function() {
+            const _id =  searchParams.get("id") ? searchParams.get("id") : userId
+            const profileInfoResponse = await ProfileApi.getProfileInfo({userId:_id})
+            if(profileInfoResponse.message === "success") {
+                dispatch(userInfoActions.setUserInfoAC(profileInfoResponse.payload.user))
+            }
+        })()
+    },[searchParams.get("id")])
 
     function updateAvatar(e:any) {
         e.preventDefault()
@@ -75,7 +86,7 @@ const Profile:React.FC = () => {
         }
 
     }
-
+    
     return <div className={classes.profile}>
         <div className={classes.profile__container}>
             <div className={classes.profile__sidebar}>
@@ -83,7 +94,7 @@ const Profile:React.FC = () => {
             </div>
             <div className={classes.profile__line}>
                 <div className={classes.avatar}>
-                    <div className={classes.avatar__wrapped}>
+                    <div className={`${classes.avatar__wrapped} ${classes.profile__block}`}>
                         <div className={classes.avatar__photo} 
                             onMouseEnter={() => setShowMenu(true)}
                             onMouseLeave={() => setShowMenu(false)}
@@ -113,6 +124,29 @@ const Profile:React.FC = () => {
                         </div>
                     </div>
                     <input ref = {fileInputRef} type = "file" onChange={updateAvatar} className={classes.avatar__input}/>
+                </div>
+            </div>
+            <div className={classes.profile__line}>
+                <div className={`${classes.info} ${classes.profile__block}`}>
+                    <div className={classes.info__wrapped}>
+                        <div className={classes.info__top}>
+                            <div className={classes.info__title}>
+                                <span>{firstName + " " + surname}</span>
+                            </div>
+                        </div>
+                        <div className={classes.info__center}>
+                            <ul className={classes.info__list}>
+                                <li>
+                                    <span>
+                                        День рождения:
+                                    </span>
+                                    <span>
+                                       {`${birthday?.day} ${CustomDate.getMonth(+birthday?.month)} ${birthday?.year} г.`}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

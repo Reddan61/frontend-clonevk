@@ -13,6 +13,8 @@ import { useNavigate } from "react-router"
 
 const Header:React.FC = () => {
     const { isAuth } = useAppSelector(state => state.login)
+    const { avatar } = useAppSelector(state => state.userinfo)
+
     const [isClickedOnCard, changeClickedOnCard] = useState(false)
     const navigate = useNavigate()
 
@@ -28,7 +30,7 @@ const Header:React.FC = () => {
             {
                 isAuth && <div className={classes.header__info}>
                     <div className={`${classes.header__card} ${classes.card}`} onClick={() => changeClickedOnCard(!isClickedOnCard)}>
-                        <img src = {noImage} className={classes.card__image}/>
+                        <img src = {avatar?.length ? avatar : noImage} className={classes.card__image}/>
                         <div className={classes.card__arrow}>
                         </div>
                     </div>
