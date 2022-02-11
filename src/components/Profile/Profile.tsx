@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from "react"
+import React, { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "react-router-dom";
 import SideBar from "@/components/SideBar/SideBar"
 import classes from "./Profile.module.scss"
@@ -10,6 +10,7 @@ import noImage from "@/images/noImage.png"
 import ArrowUp from "../svg/ArrowUp";
 import { CSSTransition } from "react-transition-group";
 import CustomDate from "@/utils/customDate";
+import Camera from "../svg/Camera";
 
 const Profile:React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -17,10 +18,13 @@ const Profile:React.FC = () => {
     const [ isUpdatingAvatar, setUpdatingAvatar] = useState(false)
     const [ showMenu, setShowMenu] = useState(false)
 
+
     const dispatch = useAppDispatch()
 
     const { userId } = useAppSelector(state => state.login)
-    const { avatar, firstName, birthday, surname } = useAppSelector(state => state.userinfo)
+    const { avatar, firstName, birthday, surname, _id } = useAppSelector(state => state.userinfo)
+
+    const isitMe = userId === _id
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const nodeRef = useRef(null)
@@ -86,7 +90,7 @@ const Profile:React.FC = () => {
         }
 
     }
-    
+
     return <div className={classes.profile}>
         <div className={classes.profile__container}>
             <div className={classes.profile__sidebar}>
@@ -101,7 +105,7 @@ const Profile:React.FC = () => {
                         >
                             <img src = {avatar?.length ? avatar : noImage}/>
                             <CSSTransition
-                                in={showMenu}
+                                in={showMenu && isitMe}
                                 timeout={300}
                                 classNames = {{
                                     enter:classes.animation__enter,
@@ -148,7 +152,154 @@ const Profile:React.FC = () => {
                         </div>
                     </div>
                 </div>
+                {
+                    isitMe &&
+                    <TextAreaNewPost />
+                }
             </div>
+        </div>
+    </div>
+}
+
+
+const TextAreaNewPost:React.FC = () => {
+    const [isClicked,setClicked] = useState(false)
+    const [textAreaText, setTextArea] = useState("")
+    const [base64Images, setBase64Images] = useState<ArrayBuffer[]>([])
+
+    const { avatar } = useAppSelector(state => state.userinfo)
+
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const refImages = useRef<ArrayBuffer[]>(base64Images)
+    const refText = useRef<string>(textAreaText)
+
+    refImages.current = base64Images
+    refText.current = textAreaText
+
+    function changeCreateTextArea(e:SyntheticEvent<HTMLTextAreaElement>) {
+        const target = e.target as HTMLTextAreaElement
+        const ref = textareaRef.current
+       
+        ref!.style.height = "auto"
+        ref!.style.height = ref!.scrollHeight + "px"
+
+        setTextArea(target.value)
+    }
+
+    function uploadImage(e:any) {
+        const extensions = ["image/png","image/jpeg","image/jpg"]
+        const files = e.target.files
+
+        const reader = new FileReader()
+
+        const succesfullFiles = []
+
+        for(let i =0; i<files.length; i++) {
+            if(extensions.includes(files[i].type)) {
+                succesfullFiles.push(files[i])
+            }
+        }
+
+        for(let i =0; i<succesfullFiles.length; i++) {
+            reader.readAsDataURL(succesfullFiles[i])
+            reader.onloadend = async (e) => {
+                const base64Image = e.target!.result as ArrayBuffer
+                setBase64Images(state => [...state,base64Image])
+                setClicked(true)
+            }
+        }
+        e.target.value = null
+    }
+    
+    function cameraClick(e:SyntheticEvent<HTMLDivElement>) {
+        e.stopPropagation()
+        fileInputRef.current!.click()
+    }
+
+    function deleteImage(index:number) {
+        const arr = [...base64Images]
+        arr.splice(index,1)
+        setBase64Images(arr)
+        if(!arr.length && !textAreaText) {
+            setClicked(false)
+        }
+    }
+
+    useEffect(() => {
+        function closeTextArea(e:any) {
+            const target = e.target as Element
+           
+            if(!target.closest(`.${classes.create}`)) {
+                if(!refText.current && !refImages.current!.length) {
+                    setClicked(false)
+                }
+            }
+        }
+
+        document.addEventListener("click",closeTextArea)
+        return () => {
+            document.removeEventListener("click",closeTextArea)
+        }
+    },[])
+
+    return <div className={`${classes.create} ${classes.profile__block}`}>
+        <input onClick = {(e) => e.stopPropagation()} multiple  ref = {fileInputRef} type = "file" onChange={uploadImage} className={classes.avatar__input}/>
+        <div className={`${classes.create__wrapped} ${isClicked && classes.create__wrapped_clicked}`}>
+            <div className={`${classes.create__top} ${isClicked && classes.create__top_clicked}`}>
+                <div className={classes.create__avatar}>
+                    <img src={avatar?.length ? avatar : noImage} />
+                </div>
+                <div className={`${classes.create__textarea} ${isClicked && classes.create__textarea_clicked}`}>
+                    <textarea ref={textareaRef} onChange = {changeCreateTextArea} onFocus={() => {
+                            setClicked(true)
+                        }} 
+                    value={textAreaText}></textarea>
+                    <span className={`${classes.create__placeholder} ${(isClicked && textAreaText) && classes.create__placeholder_disable}`}>Что у вас нового?</span>
+                </div>
+                {
+                    !isClicked && 
+                    <div className={classes.create__icons}>
+                        <div className={classes.create__camera} onClick = {cameraClick}>
+                            <Camera 
+                                width={20}
+                                height={20}
+                                color={"#a4acb5"}
+                            />
+                        </div>
+                    </div>
+                }
+            </div>   
+
+            {isClicked && <div className={classes.create__images}>
+                {base64Images.map((el,index) => {
+                    return <div  key = {`${el} ${index}`} className={classes.create__image}>
+                        <img 
+                            src = {`${el}`}
+                        />
+                        <div onClick={() => {
+                            deleteImage(index)
+                        }}><div></div></div>
+                    </div>
+                })}
+            </div> }                       
+            {
+                isClicked && <div className={classes.create__bottom}>
+                    <div className={classes.create__icons}>
+                        <div className={classes.create__camera} onClick = {cameraClick}>
+                            <Camera 
+                                width={20}
+                                height={20}
+                                color={"#a4acb5"}
+                            />
+                        </div>
+                    </div>
+                    <div className={classes.create__button}>
+                        <button>Опубликовать</button>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 }

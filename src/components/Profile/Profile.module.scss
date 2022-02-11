@@ -113,6 +113,133 @@
     
 }
 
+.create {
+    margin: 15px 0 0;
+    &__wrapped {
+        padding: 15px 20px;
+        min-width: 550px;
+        max-width: 550px;
+        &_clicked {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+    &__top {
+        display: flex;
+        align-items: center;
+        &_clicked {
+            padding: 0 0 10px;
+            align-items: flex-start;
+        }
+    }
+    &__avatar {
+        img {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+        }
+    }
+    &__textarea {
+        width: 100%;
+        margin: 0 0 0 12px;
+        position: relative;
+        font-size: 13px;
+        display: flex;
+        textarea {
+            width: 100%;
+            resize: none;
+            min-height: 15px;
+            max-height: 15px;
+        }
+        &_clicked {
+            margin: 5px 0 0 12px;
+            textarea {
+                min-height: 50px;
+                max-height: none;
+            }
+            
+        }
+    }
+    &__placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color:$input_placeholder;
+        pointer-events: none;
+        &_disable {
+            display: none;
+        }
+    }
+    &__camera {
+        cursor: pointer;
+    }
+    &__bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 0 0;
+        border-top: 1px solid $input_border;
+    }
+    &__button {
+        button {
+            font-size: 13px;
+            padding: 8px 16px;
+            background-color: #5181B2;
+            color:white;
+            border-radius: 4px;
+        }
+    }
+    &__images {
+        padding: 0 0 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    &__image {
+        position: relative;
+        width: 80px;
+        height: 100px;
+        img {
+            width: 100px;
+            height: 100px;
+            max-width: 80px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        div {
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-radius: 4px;
+            cursor: pointer;
+            div {
+                position: relative;
+                width: 18px;
+                height: 18px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: rgba($color: black, $alpha: .3);
+                &:after,&:before {
+                    content: "";
+                    position: absolute;
+                    width: 12px;
+                    height: 2px;
+                    opacity: .85;
+                    background-color: white;
+                }
+                &:after {
+                    transform: rotate(45deg);
+                }
+                &:before {
+                    transform: rotate(-45deg);
+                }
+            }
+        }
+    }
+}
+
 .animation {
     &__enter {
         opacity: 0;

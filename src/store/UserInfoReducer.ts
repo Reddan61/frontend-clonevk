@@ -5,6 +5,7 @@ const SETPROFILEINFO = "USERINFO/SETPROFILEINFO"
 
 
 const intitalState = {
+    _id:null as null | string,
     avatar:null as null | string,
     firstName: null as null | string,
     surname: null as null | string,
@@ -21,6 +22,7 @@ const UserInfoReducer = (state = intitalState,action:AnyAction) => {
         case SETPROFILEINFO:
             return {
                 ...state,
+                _id:action.payload._id,
                 firstName: action.payload.firstName,
                 surname: action.payload.surname,
                 birthday: action.payload.birthday,
@@ -40,6 +42,7 @@ export const userInfoActions = {
 export default UserInfoReducer
 
 interface ISetUserInfo {
+    _id:string,
     firstName:string,
     surname:string,
     birthday: IBirthday
