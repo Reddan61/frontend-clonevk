@@ -172,6 +172,9 @@ const TextAreaNewPost:React.FC = () => {
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
+    const imagesBlockRef = useRef<HTMLDivElement>(null)
+    const imagesSideBlockRef = useRef<HTMLDivElement>(null)
+
     const refImages = useRef<ArrayBuffer[]>(base64Images)
     const refText = useRef<string>(textAreaText)
 
@@ -188,11 +191,9 @@ const TextAreaNewPost:React.FC = () => {
         setTextArea(target.value)
     }
 
-    function uploadImage(e:any) {
+    async function uploadImage(e:any) {
         const extensions = ["image/png","image/jpeg","image/jpg"]
         const files = e.target.files
-
-        const reader = new FileReader()
 
         const succesfullFiles = []
 
@@ -203,13 +204,18 @@ const TextAreaNewPost:React.FC = () => {
         }
 
         for(let i =0; i<succesfullFiles.length; i++) {
-            reader.readAsDataURL(succesfullFiles[i])
+            const reader = new FileReader()
+
             reader.onloadend = async (e) => {
                 const base64Image = e.target!.result as ArrayBuffer
+                if(base64Images.includes(base64Image)) return
                 setBase64Images(state => [...state,base64Image])
                 setClicked(true)
             }
+
+            reader.readAsDataURL(succesfullFiles[i])
         }
+        
         e.target.value = null
     }
     
@@ -244,6 +250,34 @@ const TextAreaNewPost:React.FC = () => {
         }
     },[])
 
+    function deleteImageEvent(e:SyntheticEvent<HTMLDivElement>,position:number) {
+        const target = e.target as HTMLTextAreaElement
+        const parentDiv:HTMLDivElement | null = target.closest(`.${classes.create__image}`)
+        if(!parentDiv) return
+        parentDiv.style.transition = "all .3s linear 0s"
+        parentDiv.style.width = "0"
+        parentDiv.style.height = "0"
+        setTimeout(() => {
+            deleteImage(position)
+        },300)
+    }
+
+    //calculate sidebar of images
+    useEffect(() => {
+        if(!imagesBlockRef || !imagesBlockRef.current) {
+            return
+        }
+        const sideImages:NodeListOf<HTMLDivElement> = imagesBlockRef.current.querySelectorAll(".create__image_js")
+        const imageHeight = 340 / sideImages.length
+
+        sideImages.forEach((el) => {
+            if(base64Images.length > 1 && imagesSideBlockRef.current) {
+                imagesSideBlockRef.current.style.maxWidth = `35%`
+            }
+            el.style.maxHeight = imageHeight + "px"
+        })
+    },[base64Images,isClicked])
+
     return <div className={`${classes.create} ${classes.profile__block}`}>
         <input onClick = {(e) => e.stopPropagation()} multiple  ref = {fileInputRef} type = "file" onChange={uploadImage} className={classes.avatar__input}/>
         <div className={`${classes.create__wrapped} ${isClicked && classes.create__wrapped_clicked}`}>
@@ -272,18 +306,61 @@ const TextAreaNewPost:React.FC = () => {
                 }
             </div>   
 
-            {isClicked && <div className={classes.create__images}>
-                {base64Images.map((el,index) => {
-                    return <div  key = {`${el} ${index}`} className={classes.create__image}>
-                        <img 
-                            src = {`${el}`}
-                        />
-                        <div onClick={() => {
-                            deleteImage(index)
-                        }}><div></div></div>
+            {isClicked && <div ref= {imagesBlockRef} className={classes.create__images}>
+                <div className={classes.create__images_top}>
+                    <div className={classes.create__images_one}>
+                        {
+                            base64Images.slice(0,1).map((el,index) => {
+                                return <div  key = {`${el} ${index}`} className={`${classes.create__image}`}>
+                                    <img 
+                                        src = {`${el}`}
+                                    />
+                                    <div onClick={(e) => {
+                                       deleteImageEvent(e,0)
+                                    }}>
+                                        <div>
+                                        </div>
+                                    </div>
+                                </div>
+                            })
+                        }
                     </div>
-                })}
-            </div> }                       
+                    <div ref = {imagesSideBlockRef} className={classes.create__images_side}>
+                        {
+                            base64Images.slice(1,4).map((el,index) => {
+                                return <div  key = {`${el} ${index + 1}`} className={`${classes.create__image} create__image_js`}>
+                                    <img 
+                                        src = {`${el}`}
+                                    />
+                                    <div onClick={(e) => {
+                                       deleteImageEvent(e,index+1)
+                                    }}>
+                                        <div>
+                                        </div>
+                                    </div>
+                                </div>
+                            })
+                        }
+                    </div>
+                </div>
+                <div className={classes.create__images_bottom}>
+                    {
+                            base64Images.slice(4,base64Images.length).map((el,index) => {
+                                return <div  key = {`${el} ${index + 4}`} className={`${classes.create__image} ${classes.create__image_bottom}`}>
+                                    <img 
+                                        src = {`${el}`}
+                                    />
+                                    <div onClick={(e) => {
+                                        deleteImageEvent(e,index+4)
+                                    }}>
+                                        <div>
+                                        </div>
+                                    </div>
+                                </div>
+                            })
+                        }
+                </div>
+            </div>}                       
             {
                 isClicked && <div className={classes.create__bottom}>
                     <div className={classes.create__icons}>
