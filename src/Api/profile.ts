@@ -1,4 +1,5 @@
 import instance from "./axios.settings"
+import { IApiResponse } from "./interfacesApi"
 
 
 
@@ -85,11 +86,4 @@ export class ProfileApi {
         }
     }
 
-}
-
-interface IApiResponse {
-    message:"success" | "error",
-    payload: {
-        [name: string]: any
-    }
 }

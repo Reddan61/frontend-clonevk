@@ -1,4 +1,5 @@
 import instance from "./axios.settings"
+import { IApiResponse } from "./interfacesApi"
 
 
 
@@ -23,7 +24,7 @@ export class AuthApi {
         }
     }
 
-    static async sendEmail(payload:ISendEmailPayload) {
+    static async sendEmail(payload:ISendEmailPayload):Promise<IApiResponse> {
         try {
             const response = await instance.patch("auth/send",payload)
 
@@ -42,7 +43,7 @@ export class AuthApi {
         }
     }
 
-    static async verifyEmail(payload:IVerifyEmailPayload) {
+    static async verifyEmail(payload:IVerifyEmailPayload):Promise<IApiResponse> {
         try {
             const response = await instance.patch("auth/verify",payload)
             
@@ -61,7 +62,7 @@ export class AuthApi {
         }
     }
 
-    static async setPassword(payload:ISetPasswordPayload) {
+    static async setPassword(payload:ISetPasswordPayload):Promise<IApiResponse> {
         try {
             const response = await instance.patch("auth/setpassword",payload)
 
@@ -80,7 +81,7 @@ export class AuthApi {
         }
     }
 
-    static async login(payload:ILoginPayload) {
+    static async login(payload:ILoginPayload):Promise<IApiResponse> {
         try {
             const response = await instance.post("auth/login",payload)
 
@@ -139,13 +140,6 @@ export interface ISetPasswordPayload {
 export interface ILoginPayload {
     email:string,
     password:string
-}
-
-interface IApiResponse {
-    message:"success" | "error",
-    payload: {
-        [name: string]: any
-    }
 }
 
 export interface IPreRegisterPayload {

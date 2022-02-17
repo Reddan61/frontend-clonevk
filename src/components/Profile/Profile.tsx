@@ -1,5 +1,5 @@
-import React, { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from "react"
-import { useSearchParams } from "react-router-dom";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom";
 import SideBar from "@/components/SideBar/SideBar"
 import classes from "./Profile.module.scss"
 import { ProfileApi } from "@/Api/profile";
@@ -11,13 +11,18 @@ import ArrowUp from "../svg/ArrowUp";
 import { CSSTransition } from "react-transition-group";
 import CustomDate from "@/utils/customDate";
 import Camera from "../svg/Camera";
+import { ICreatePostPayload, PostsApi } from "@/Api/posts";
+import ImagesGrid from "../ImagesGrid/ImagesGrid";
+import { isMongoDBId } from "@/utils/isMongoDBId";
 
 const Profile:React.FC = () => {
+    const navigate = useNavigate()
+
     const [searchParams, setSearchParams] = useSearchParams()
 
     const [ isUpdatingAvatar, setUpdatingAvatar] = useState(false)
     const [ showMenu, setShowMenu] = useState(false)
-
+    const [ pageNumber, setPageNumber ] = useState(1)
 
     const dispatch = useAppDispatch()
 
@@ -32,6 +37,13 @@ const Profile:React.FC = () => {
     useEffect(() => {
         (async function() {
             const _id =  searchParams.get("id") ? searchParams.get("id") : userId
+            if(!isMongoDBId(_id)) {
+                navigate("/auth/login",{
+                    replace:true
+                })
+                return 
+            }
+
             const avatarIdResponse = await ProfileApi.getAvatar({_id})
             
             if(avatarIdResponse.message === "success") {
@@ -46,12 +58,36 @@ const Profile:React.FC = () => {
     useEffect(() => {
         (async function() {
             const _id =  searchParams.get("id") ? searchParams.get("id") : userId
+            if(!isMongoDBId(_id)) {
+                navigate("/auth/login",{
+                    replace:true
+                })
+                return 
+            }
             const profileInfoResponse = await ProfileApi.getProfileInfo({userId:_id})
             if(profileInfoResponse.message === "success") {
                 dispatch(userInfoActions.setUserInfoAC(profileInfoResponse.payload.user))
             }
         })()
     },[searchParams.get("id")])
+
+    useEffect(() => {
+        (async function() {
+            const _id =  searchParams.get("id") ? searchParams.get("id") : userId
+            if(!isMongoDBId(_id)) {
+                navigate("/auth/login",{
+                    replace:true
+                })
+                return 
+            }
+            const postsResponse = await getPosts()
+        })()
+    },[searchParams.get("id")])
+
+    async function getPosts() {
+        const postsResponse = await PostsApi.getUserPosts(userId,pageNumber)
+        return postsResponse
+    }
 
     function updateAvatar(e:any) {
         e.preventDefault()
@@ -156,6 +192,11 @@ const Profile:React.FC = () => {
                     isitMe &&
                     <TextAreaNewPost />
                 }
+                <div className={`${classes.posts}`}>
+                    {/* <div>
+
+                    </div> */}
+                </div>
             </div>
         </div>
     </div>
@@ -167,13 +208,11 @@ const TextAreaNewPost:React.FC = () => {
     const [textAreaText, setTextArea] = useState("")
     const [base64Images, setBase64Images] = useState<ArrayBuffer[]>([])
 
+    const { userId } = useAppSelector(state => state.login)
     const { avatar } = useAppSelector(state => state.userinfo)
 
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    const imagesBlockRef = useRef<HTMLDivElement>(null)
-    const imagesSideBlockRef = useRef<HTMLDivElement>(null)
 
     const refImages = useRef<ArrayBuffer[]>(base64Images)
     const refText = useRef<string>(textAreaText)
@@ -250,33 +289,23 @@ const TextAreaNewPost:React.FC = () => {
         }
     },[])
 
-    function deleteImageEvent(e:SyntheticEvent<HTMLDivElement>,position:number) {
-        const target = e.target as HTMLTextAreaElement
-        const parentDiv:HTMLDivElement | null = target.closest(`.${classes.create__image}`)
-        if(!parentDiv) return
-        parentDiv.style.transition = "all .3s linear 0s"
-        parentDiv.style.width = "0"
-        parentDiv.style.height = "0"
-        setTimeout(() => {
-            deleteImage(position)
-        },300)
-    }
+    async function submit() {
+        const payload:ICreatePostPayload = {
+            userId,
+            images:base64Images,
+            text: textAreaText
+        }
 
-    //calculate sidebar of images
-    useEffect(() => {
-        if(!imagesBlockRef || !imagesBlockRef.current) {
+        setBase64Images([])
+        setTextArea("")
+        setClicked(false)
+        
+        if(!payload.images && !payload.text) {
             return
         }
-        const sideImages:NodeListOf<HTMLDivElement> = imagesBlockRef.current.querySelectorAll(".create__image_js")
-        const imageHeight = 340 / sideImages.length
-
-        sideImages.forEach((el) => {
-            if(base64Images.length > 1 && imagesSideBlockRef.current) {
-                imagesSideBlockRef.current.style.maxWidth = `35%`
-            }
-            el.style.maxHeight = imageHeight + "px"
-        })
-    },[base64Images,isClicked])
+        const response = await PostsApi.create(payload)
+        console.log(response)
+    }
 
     return <div className={`${classes.create} ${classes.profile__block}`}>
         <input onClick = {(e) => e.stopPropagation()} multiple  ref = {fileInputRef} type = "file" onChange={uploadImage} className={classes.avatar__input}/>
@@ -306,61 +335,7 @@ const TextAreaNewPost:React.FC = () => {
                 }
             </div>   
 
-            {isClicked && <div ref= {imagesBlockRef} className={classes.create__images}>
-                <div className={classes.create__images_top}>
-                    <div className={classes.create__images_one}>
-                        {
-                            base64Images.slice(0,1).map((el,index) => {
-                                return <div  key = {`${el} ${index}`} className={`${classes.create__image}`}>
-                                    <img 
-                                        src = {`${el}`}
-                                    />
-                                    <div onClick={(e) => {
-                                       deleteImageEvent(e,0)
-                                    }}>
-                                        <div>
-                                        </div>
-                                    </div>
-                                </div>
-                            })
-                        }
-                    </div>
-                    <div ref = {imagesSideBlockRef} className={classes.create__images_side}>
-                        {
-                            base64Images.slice(1,4).map((el,index) => {
-                                return <div  key = {`${el} ${index + 1}`} className={`${classes.create__image} create__image_js`}>
-                                    <img 
-                                        src = {`${el}`}
-                                    />
-                                    <div onClick={(e) => {
-                                       deleteImageEvent(e,index+1)
-                                    }}>
-                                        <div>
-                                        </div>
-                                    </div>
-                                </div>
-                            })
-                        }
-                    </div>
-                </div>
-                <div className={classes.create__images_bottom}>
-                    {
-                            base64Images.slice(4,base64Images.length).map((el,index) => {
-                                return <div  key = {`${el} ${index + 4}`} className={`${classes.create__image} ${classes.create__image_bottom}`}>
-                                    <img 
-                                        src = {`${el}`}
-                                    />
-                                    <div onClick={(e) => {
-                                        deleteImageEvent(e,index+4)
-                                    }}>
-                                        <div>
-                                        </div>
-                                    </div>
-                                </div>
-                            })
-                        }
-                </div>
-            </div>}                       
+            {isClicked && <ImagesGrid base64Images={base64Images} deleteImage = {deleteImage}/>}                       
             {
                 isClicked && <div className={classes.create__bottom}>
                     <div className={classes.create__icons}>
@@ -373,7 +348,7 @@ const TextAreaNewPost:React.FC = () => {
                         </div>
                     </div>
                     <div className={classes.create__button}>
-                        <button>Опубликовать</button>
+                        <button onClick = {submit}>Опубликовать</button>
                     </div>
                 </div>
             }
