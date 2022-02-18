@@ -44,7 +44,7 @@ export class ProfileApi {
         }
     }
 
-    static async getAvatarUrl(payload:{public_id:string}):Promise<IApiResponse> {
+    static async getImageUrl(payload:{public_id:string}):Promise<IApiResponse> {
         try {
             const response = await instance.get(`images`, {
                 params: {
@@ -85,5 +85,4 @@ export class ProfileApi {
             }
         }
     }
-
 }

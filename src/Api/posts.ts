@@ -29,7 +29,6 @@ export class PostsApi {
                     page
                 }
             })
-            console.log(response)
             return {
                 message:"success",
                 payload: {
@@ -49,5 +48,5 @@ export class PostsApi {
 export interface ICreatePostPayload {
     userId:string,
     text:string,
-    images:Array<ArrayBuffer>
+    images:Array<string>
 }

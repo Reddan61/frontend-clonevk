@@ -5,7 +5,7 @@ import classes from "./Profile.module.scss"
 import { ProfileApi } from "@/Api/profile";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import withCheckAuth from "../HOCs/withCheckAuth";
-import { userInfoActions } from "@/store/UserInfoReducer";
+import { IPost, userInfoActions } from "@/store/UserInfoReducer";
 import noImage from "@/images/noImage.png"
 import ArrowUp from "../svg/ArrowUp";
 import { CSSTransition } from "react-transition-group";
@@ -14,6 +14,8 @@ import Camera from "../svg/Camera";
 import { ICreatePostPayload, PostsApi } from "@/Api/posts";
 import ImagesGrid from "../ImagesGrid/ImagesGrid";
 import { isMongoDBId } from "@/utils/isMongoDBId";
+import Post from "../Post/Post";
+import { useDispatch } from "react-redux";
 
 const Profile:React.FC = () => {
     const navigate = useNavigate()
@@ -27,33 +29,37 @@ const Profile:React.FC = () => {
     const dispatch = useAppDispatch()
 
     const { userId } = useAppSelector(state => state.login)
-    const { avatar, firstName, birthday, surname, _id } = useAppSelector(state => state.userinfo)
+    const { avatar, firstName, birthday, surname, _id, posts } = useAppSelector(state => state.userinfo)
 
     const isitMe = userId === _id
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const nodeRef = useRef(null)
 
-    useEffect(() => {
-        (async function() {
-            const _id =  searchParams.get("id") ? searchParams.get("id") : userId
-            if(!isMongoDBId(_id)) {
-                navigate("/auth/login",{
-                    replace:true
-                })
-                return 
-            }
-
-            const avatarIdResponse = await ProfileApi.getAvatar({_id})
+    async function getAvatar(id:string) {
+        const avatarIdResponse = await ProfileApi.getAvatar({_id:id})
             
-            if(avatarIdResponse.message === "success") {
-                const avatarUrlResponse = await ProfileApi.getAvatarUrl({public_id:avatarIdResponse.payload.public_id})
-                if(avatarUrlResponse.message === "success") { 
-                    dispatch(userInfoActions.setAvatarAC(avatarUrlResponse.payload.image_url))
-                }
+        if(avatarIdResponse.message === "success") {
+            const avatarUrlResponse = await ProfileApi.getImageUrl({public_id:avatarIdResponse.payload.public_id})
+            if(avatarUrlResponse.message === "success") { 
+                dispatch(userInfoActions.setAvatarAC(avatarUrlResponse.payload.image_url))
             }
-        })()
-    },[searchParams.get("id")])
+        }
+    }
+
+    async function getProfileInfo(id:string) {
+        const profileInfoResponse = await ProfileApi.getProfileInfo({userId:id})
+        if(profileInfoResponse.message === "success") {
+            dispatch(userInfoActions.setUserInfoAC(profileInfoResponse.payload.user))
+        }
+    }
+
+    async function getProfilePosts(id:string) {
+        const postsResponse = await getPosts(id)
+        if(postsResponse.message === "success") {
+            dispatch(userInfoActions.setPosts(postsResponse.payload.posts))
+        }
+    }
 
     useEffect(() => {
         (async function() {
@@ -64,28 +70,15 @@ const Profile:React.FC = () => {
                 })
                 return 
             }
-            const profileInfoResponse = await ProfileApi.getProfileInfo({userId:_id})
-            if(profileInfoResponse.message === "success") {
-                dispatch(userInfoActions.setUserInfoAC(profileInfoResponse.payload.user))
-            }
+            await getAvatar(_id)
+            await getProfileInfo(_id)
+            await getProfilePosts(_id)
         })()
     },[searchParams.get("id")])
 
-    useEffect(() => {
-        (async function() {
-            const _id =  searchParams.get("id") ? searchParams.get("id") : userId
-            if(!isMongoDBId(_id)) {
-                navigate("/auth/login",{
-                    replace:true
-                })
-                return 
-            }
-            const postsResponse = await getPosts()
-        })()
-    },[searchParams.get("id")])
 
-    async function getPosts() {
-        const postsResponse = await PostsApi.getUserPosts(userId,pageNumber)
+    async function getPosts(id:string) {
+        const postsResponse = await PostsApi.getUserPosts(id,pageNumber)
         return postsResponse
     }
 
@@ -117,7 +110,7 @@ const Profile:React.FC = () => {
         reader.onloadend = async () => {
             const avatarIdResponse = await ProfileApi.setAvatar({base64Image : reader.result as string})
             if(avatarIdResponse.message === "success") {
-                const avatarUrlResponse = await ProfileApi.getAvatarUrl({public_id:avatarIdResponse.payload.public_id})
+                const avatarUrlResponse = await ProfileApi.getImageUrl({public_id:avatarIdResponse.payload.public_id})
                 if(avatarUrlResponse.message === "success") { 
                     dispatch(userInfoActions.setAvatarAC(avatarUrlResponse.payload.image_url))
                 }
@@ -192,10 +185,12 @@ const Profile:React.FC = () => {
                     isitMe &&
                     <TextAreaNewPost />
                 }
-                <div className={`${classes.posts}`}>
-                    {/* <div>
-
-                    </div> */}
+                <div className={`${classes.profile__posts}`}>
+                    {
+                        posts.map((el:IPost) => {
+                            return <Post key = {el._id} post = {el}/>
+                        })
+                    }
                 </div>
             </div>
         </div>
@@ -206,15 +201,17 @@ const Profile:React.FC = () => {
 const TextAreaNewPost:React.FC = () => {
     const [isClicked,setClicked] = useState(false)
     const [textAreaText, setTextArea] = useState("")
-    const [base64Images, setBase64Images] = useState<ArrayBuffer[]>([])
+    const [base64Images, setBase64Images] = useState<string[]>([])
 
     const { userId } = useAppSelector(state => state.login)
-    const { avatar } = useAppSelector(state => state.userinfo)
+    const { avatar, posts } = useAppSelector(state => state.userinfo)
+
+    const dispatch = useDispatch()
 
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const refImages = useRef<ArrayBuffer[]>(base64Images)
+    const refImages = useRef<string[]>(base64Images)
     const refText = useRef<string>(textAreaText)
 
     refImages.current = base64Images
@@ -246,7 +243,7 @@ const TextAreaNewPost:React.FC = () => {
             const reader = new FileReader()
 
             reader.onloadend = async (e) => {
-                const base64Image = e.target!.result as ArrayBuffer
+                const base64Image = e.target!.result as string
                 if(base64Images.includes(base64Image)) return
                 setBase64Images(state => [...state,base64Image])
                 setClicked(true)
@@ -304,7 +301,8 @@ const TextAreaNewPost:React.FC = () => {
             return
         }
         const response = await PostsApi.create(payload)
-        console.log(response)
+        if(response.message === "success")
+            dispatch(userInfoActions.setPosts([response.payload.post,...posts]))
     }
 
     return <div className={`${classes.create} ${classes.profile__block}`}>
@@ -335,7 +333,7 @@ const TextAreaNewPost:React.FC = () => {
                 }
             </div>   
 
-            {isClicked && <ImagesGrid base64Images={base64Images} deleteImage = {deleteImage}/>}                       
+            {isClicked && <ImagesGrid images={base64Images} deleteImage = {deleteImage} canBeDelete={true}/>}                       
             {
                 isClicked && <div className={classes.create__bottom}>
                     <div className={classes.create__icons}>

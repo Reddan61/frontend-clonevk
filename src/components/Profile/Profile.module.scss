@@ -27,6 +27,11 @@
         box-shadow:  0 1px 0 0 #dce1e6, 0 0 0 1px #e7e8ec;
         background-color: white;
     }
+    &__posts {
+        width: 100%;
+        margin: 15px 0 0;
+        border-radius: 4px 4px 0 0;
+    }
 }
 
 .avatar {
