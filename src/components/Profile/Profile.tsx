@@ -16,6 +16,7 @@ import ImagesGrid from "../ImagesGrid/ImagesGrid";
 import { isMongoDBId } from "@/utils/isMongoDBId";
 import Post from "../Post/Post";
 import { useDispatch } from "react-redux";
+import ProfilePosts from "./ProfilePosts";
 
 const Profile:React.FC = () => {
     const navigate = useNavigate()
@@ -24,12 +25,11 @@ const Profile:React.FC = () => {
 
     const [ isUpdatingAvatar, setUpdatingAvatar] = useState(false)
     const [ showMenu, setShowMenu] = useState(false)
-    const [ pageNumber, setPageNumber ] = useState(1)
 
     const dispatch = useAppDispatch()
 
     const { userId } = useAppSelector(state => state.login)
-    const { avatar, firstName, birthday, surname, _id, posts } = useAppSelector(state => state.userinfo)
+    const { avatar, firstName, birthday, surname, _id } = useAppSelector(state => state.userinfo)
 
     const isitMe = userId === _id
 
@@ -54,12 +54,6 @@ const Profile:React.FC = () => {
         }
     }
 
-    async function getProfilePosts(id:string) {
-        const postsResponse = await getPosts(id)
-        if(postsResponse.message === "success") {
-            dispatch(userInfoActions.setPosts(postsResponse.payload.posts))
-        }
-    }
 
     useEffect(() => {
         (async function() {
@@ -72,15 +66,8 @@ const Profile:React.FC = () => {
             }
             await getAvatar(_id)
             await getProfileInfo(_id)
-            await getProfilePosts(_id)
         })()
     },[searchParams.get("id")])
-
-
-    async function getPosts(id:string) {
-        const postsResponse = await PostsApi.getUserPosts(id,pageNumber)
-        return postsResponse
-    }
 
     function updateAvatar(e:any) {
         e.preventDefault()
@@ -186,11 +173,7 @@ const Profile:React.FC = () => {
                     <TextAreaNewPost />
                 }
                 <div className={`${classes.profile__posts}`}>
-                    {
-                        posts.map((el:IPost) => {
-                            return <Post key = {el._id} post = {el}/>
-                        })
-                    }
+                    <ProfilePosts />
                 </div>
             </div>
         </div>

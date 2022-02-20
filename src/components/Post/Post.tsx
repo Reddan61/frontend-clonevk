@@ -31,7 +31,7 @@ const Post:React.FC<IProps> = ({post}) => {
                     }
                 }
             }
-            const response = await ProfileApi.getImageUrl({public_id:post.author.avatar})
+            const response = await ProfileApi.getImageUrl({public_id:author.avatar})
             if(response.message === "success")
                 setAvatar(response.payload.image_url)
             setImages(imagesResponse)
@@ -55,7 +55,7 @@ const Post:React.FC<IProps> = ({post}) => {
                             <span>{author.surname}</span>
                         </div>
                         <div className={classes.card__date}>
-                            {`${dateInstance.getDay()} ${CustomDate.getMonth(dateInstance.getMonth())} ${dateInstance.getFullYear()}`}
+                            {`${dateInstance.getDate()} ${CustomDate.getMonth(dateInstance.getMonth())} ${dateInstance.getFullYear()}`}
                         </div>
                     </div>
                 </div>
