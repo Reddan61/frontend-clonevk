@@ -43,6 +43,49 @@ export class PostsApi {
             }
         }
     }
+
+    static async isLiked(postId:string):Promise<IApiResponse> {
+        try {
+            const response = await instance.get(`posts/like`,{
+                params : {
+                    postId
+                }
+            })
+
+            return {
+                message:"success",
+                payload: {
+                    ...response.data.payload
+                }
+            }
+        }
+        catch(e:any) {
+            return {
+                message:"error",
+                payload: {}
+            }
+        }
+    }
+    static async setLike(postId:string):Promise<IApiResponse> {
+        try {
+            const response = await instance.patch(`posts/like`,{
+                postId
+            })
+
+            return {
+                message:"success",
+                payload: {
+                    ...response.data.payload
+                }
+            }
+        }
+        catch(e:any) {
+            return {
+                message:"error",
+                payload: {}
+            }
+        }
+    }
 }
 
 export interface ICreatePostPayload {

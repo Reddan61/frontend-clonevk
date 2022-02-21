@@ -2,7 +2,6 @@ import { AnyAction } from "redux"
 
 const SETAVATAR = "USERINFO/SETAVATAR"
 const SETPROFILEINFO = "USERINFO/SETPROFILEINFO"
-const SETPOSTS = "USERINFO/SETPOSTS"
 
 
 const intitalState = {
@@ -10,8 +9,7 @@ const intitalState = {
     avatar:null as null | string,
     firstName: null as null | string,
     surname: null as null | string,
-    birthday: null as null | IBirthday,
-    posts: [] as [] | Posts
+    birthday: null as null | IBirthday
 }
 
 const UserInfoReducer = (state = intitalState,action:AnyAction) => {
@@ -29,11 +27,6 @@ const UserInfoReducer = (state = intitalState,action:AnyAction) => {
                 surname: action.payload.surname,
                 birthday: action.payload.birthday,
             }
-        case SETPOSTS: 
-            return {
-                ...state,
-                posts:action.payload.posts
-            }
         default:
             return state
     }
@@ -42,8 +35,7 @@ const UserInfoReducer = (state = intitalState,action:AnyAction) => {
 
 export const userInfoActions = {
     setAvatarAC: (avatar:string) => ({type:SETAVATAR,payload:{avatar}}), 
-    setUserInfoAC: (payload:ISetUserInfo) => ({type:SETPROFILEINFO,payload}),
-    setPosts: (posts:Posts) => ({type:SETPOSTS,payload:{posts}})
+    setUserInfoAC: (payload:ISetUserInfo) => ({type:SETPROFILEINFO,payload})
 }
 
 
@@ -60,20 +52,4 @@ interface IBirthday {
     day:string,
     month:string,
     year:string
-}
-
-type Posts = Array<IPost>
-
-export interface IPost {
-    _id:string,
-    date: string,
-    likes:number,
-    text:string,
-    imagesIds:string,
-    author: {
-        _id:string,
-        avatar:string,
-        firstName:string,
-        surname:string
-    }
 }

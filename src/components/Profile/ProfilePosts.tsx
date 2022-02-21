@@ -1,6 +1,7 @@
 import { PostsApi } from "@/Api/posts"
+import { IPost, postsActions } from "@/store/PostsReducer"
 import { useAppSelector } from "@/store/store"
-import { IPost, userInfoActions } from "@/store/UserInfoReducer"
+import { userInfoActions } from "@/store/UserInfoReducer"
 import { isMongoDBId } from "@/utils/isMongoDBId"
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -11,7 +12,7 @@ import Post from "../Post/Post"
 
 const ProfilePosts:React.FC = () => {
     const { userId } = useAppSelector(state => state.login)
-    const { posts } = useAppSelector(state => state.userinfo)
+    const { posts } = useAppSelector(state => state.posts)
     
     const [searchParams, setSearchParams] = useSearchParams()
     const dispatch = useDispatch()
@@ -45,7 +46,7 @@ const ProfilePosts:React.FC = () => {
             const _id =  searchParams.get("id") ? searchParams.get("id") : userId
             const response = await getPosts(_id)
             if(response.message === "success")
-                dispatch(userInfoActions.setPosts([...posts,...response.payload.posts]))
+                dispatch(postsActions.setPosts([...posts,...response.payload.posts]))
             setLoading(false)
         })()
     },[pageNumber])
@@ -75,7 +76,7 @@ const ProfilePosts:React.FC = () => {
         const postsResponse = await getPosts(id)
         if(postsResponse.message === "success") {
             setTotalPages(postsResponse.payload.totalPages)
-            dispatch(userInfoActions.setPosts(postsResponse.payload.posts))
+            dispatch(postsActions.setPosts(postsResponse.payload.posts))
         }
     }
 

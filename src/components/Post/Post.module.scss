@@ -26,6 +26,33 @@ $skeleton: rgb(216, 216, 216);
         font-size: 13px;
         padding: 0 0 15px 5px;
     }
+    &__bottom {
+        display: flex;
+        align-items: center;
+        padding: 0 0 10px 0;
+    }
+    &__like {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 32px;
+        background-color: #f0f2f5;
+        &_active {
+            background-color: #ffeded;
+            span {
+                color:#FF3347 !important;
+            }
+        }
+        img {
+            width: 24px;
+            height: 24px;
+        }
+        span {
+            margin: 0 0 0 5px;
+            color:#99a2ad;
+        }
+    }
 }
 
 .card {

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react"
 import { ProfileApi } from "@/Api/profile"
-import { IPost } from "@/store/UserInfoReducer"
 import ImagesGrid from "../ImagesGrid/ImagesGrid"
 import classes from "./Post.module.scss"
 import noImage from "@/images/noImage.png"
 import CustomDate from "@/utils/customDate"
+import Heart from "../svg/Heart"
+import { PostsApi } from "@/Api/posts"
+import redHeart from "@/images/redHeart.png"
+import { IPost, postsActions } from "@/store/PostsReducer"
+import { useDispatch } from "react-redux"
 
 
 interface IProps {
@@ -12,11 +16,15 @@ interface IProps {
 }
 
 const Post:React.FC<IProps> = ({post}) => {
-    const { date, likes, text, author, imagesIds } = post
+    const { date, likes, text, author, imagesIds, _id, isLiked } = post
+
+    const dispatch = useDispatch()
 
     const dateInstance = new Date(date)
 
     const [isLoading, setLoading] = useState(true)
+    const [likeLoading, setLikeLoading] = useState(false)
+
     const [images,setImages] = useState<Array<string>>([])
     const [avatar,setAvatar] = useState<string>("")
     
@@ -31,13 +39,41 @@ const Post:React.FC<IProps> = ({post}) => {
                     }
                 }
             }
-            const response = await ProfileApi.getImageUrl({public_id:author.avatar})
-            if(response.message === "success")
-                setAvatar(response.payload.image_url)
+            const responseImage = await ProfileApi.getImageUrl({public_id:author.avatar})
+            if(responseImage.message === "success")
+                setAvatar(responseImage.payload.image_url)
+
+            const responseLike = await PostsApi.isLiked(_id)
+
+            if(responseLike.message === "success") {
+                const payload = {
+                    postId:_id,
+                    isLiked: responseLike.payload.isLiked,
+                    likes
+                }
+                dispatch(postsActions.setIsLike(payload))
+            }
             setImages(imagesResponse)
             setLoading(false)
         })()
     },[])
+
+    async function setLiked() {
+        if(likeLoading)
+            return
+        setLikeLoading(true)
+        const response = await PostsApi.setLike(_id)
+        console.log(response)
+        if(response.message === "success") {
+            const payload = {
+                postId: _id,
+                isLiked: response.payload.isLiked,
+                likes: response.payload.likes
+            }
+            dispatch(postsActions.setIsLike(payload))
+        }
+        setLikeLoading(false)
+    }
 
     if(isLoading) {
         return <Skeleton />
@@ -73,6 +109,16 @@ const Post:React.FC<IProps> = ({post}) => {
                     images.length > 0 && 
                     <ImagesGrid images={images} canBeDelete = {false}/>
                 }
+            </div>
+            <div className={classes.post__bottom}>
+                <div className={`${classes.post__like} ${isLiked && classes.post__like_active}`} onClick = {setLiked}>
+                    { isLiked ? 
+                        <img src = {redHeart}/>
+                    : <Heart 
+                        width={24} height={24} color = {"#99a2ad"}
+                    />}
+                    <span>{likes}</span>
+                </div>
             </div>
         </div>
     </div>

@@ -5,7 +5,7 @@ import classes from "./Profile.module.scss"
 import { ProfileApi } from "@/Api/profile";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import withCheckAuth from "../HOCs/withCheckAuth";
-import { IPost, userInfoActions } from "@/store/UserInfoReducer";
+import { userInfoActions } from "@/store/UserInfoReducer";
 import noImage from "@/images/noImage.png"
 import ArrowUp from "../svg/ArrowUp";
 import { CSSTransition } from "react-transition-group";
@@ -17,6 +17,7 @@ import { isMongoDBId } from "@/utils/isMongoDBId";
 import Post from "../Post/Post";
 import { useDispatch } from "react-redux";
 import ProfilePosts from "./ProfilePosts";
+import { postsActions } from "@/store/PostsReducer";
 
 const Profile:React.FC = () => {
     const navigate = useNavigate()
@@ -187,7 +188,8 @@ const TextAreaNewPost:React.FC = () => {
     const [base64Images, setBase64Images] = useState<string[]>([])
 
     const { userId } = useAppSelector(state => state.login)
-    const { avatar, posts } = useAppSelector(state => state.userinfo)
+    const { avatar } = useAppSelector(state => state.userinfo)
+    const { posts } = useAppSelector(state => state.posts)
 
     const dispatch = useDispatch()
 
@@ -285,7 +287,7 @@ const TextAreaNewPost:React.FC = () => {
         }
         const response = await PostsApi.create(payload)
         if(response.message === "success")
-            dispatch(userInfoActions.setPosts([response.payload.post,...posts]))
+            dispatch(postsActions.setPosts([response.payload.post,...posts]))
     }
 
     return <div className={`${classes.create} ${classes.profile__block}`}>
