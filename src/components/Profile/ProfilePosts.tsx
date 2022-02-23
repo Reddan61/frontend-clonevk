@@ -1,7 +1,7 @@
 import { PostsApi } from "@/Api/posts"
 import { IPost, postsActions } from "@/store/PostsReducer"
 import { useAppSelector } from "@/store/store"
-import { userInfoActions } from "@/store/UserInfoReducer"
+import { userInfoActions } from "@/store/ProfileReducer"
 import { isMongoDBId } from "@/utils/isMongoDBId"
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
@@ -74,6 +74,7 @@ const ProfilePosts:React.FC = () => {
 
     async function getProfilePosts(id:string) {
         const postsResponse = await getPosts(id)
+        console.log(postsResponse)
         if(postsResponse.message === "success") {
             setTotalPages(postsResponse.payload.totalPages)
             dispatch(postsActions.setPosts(postsResponse.payload.posts))

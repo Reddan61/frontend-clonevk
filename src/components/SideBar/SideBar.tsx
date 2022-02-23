@@ -1,13 +1,20 @@
 import React from "react"
-import Chat from "../svg/Chat"
+import { useNavigate } from "react-router"
+import Friends from "../svg/Friends"
 import News from "../svg/News"
 import Profile from "../svg/Profile"
 import classes from "./SideBar.module.scss"
 
 const SideBar:React.FC = () => {
+    const navigate = useNavigate()
+
     return <div className={classes.sidebar}>
         <ul>
-            <li>
+            <li onClick = {() => {
+                navigate("/profile",{
+                    replace:true
+                })
+            }}>
                 <Profile width={20} height={20} color="#5181b8"/>
                 <span>Моя страница</span>
             </li>
@@ -15,9 +22,13 @@ const SideBar:React.FC = () => {
                 <News width={20} height={20} color="#5181b8"/>
                 <span>Новости</span>
             </li>
-            <li>
-                <Chat width={20} height={20} color="#5181b8"/>
-                <span>Мессенджер</span>
+            <li onClick = {() => {
+                navigate("/friends",{
+                    replace:true
+                })
+            }}>
+                <Friends width={20} height={20} color="#5181b8"/>
+                <span>Друзья</span>
             </li>
         </ul>
     </div>

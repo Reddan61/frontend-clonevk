@@ -1,0 +1,109 @@
+@import "@/_vars.scss";
+
+
+.friends {
+    width: 100%;
+    min-height: calc(100vh - #{$header_height});
+    background-color: $background_page;
+    display: flex;
+    justify-content: center;
+    &__container {
+        padding: 20px 0 0;
+        width: 100%;
+        max-width: $container;
+        display: flex;
+    }
+    &__sidebar {
+        padding: 0 0 0 15px;
+        min-width: 164px;
+    }
+    &__body {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px 0 0;
+    }
+    &__top {
+        width: 100%;
+    }
+    &__block {
+        border-radius: 4px;
+        box-shadow:  0 1px 0 0 #dce1e6, 0 0 0 1px #e7e8ec;
+        background-color: white;
+    }
+    &__other {
+        margin:15px 0;
+        padding: 0 13px;
+    }
+    &__friends {
+        padding: 0 13px;
+    }
+    &__input {
+        
+    }
+}
+
+.input {
+    width: 100%;
+    display: flex;
+    border-bottom: 1px solid $input_border;
+    padding: 14px 0 13px 20px;
+    font-size: 13px;
+    &__wrapped {
+        position: relative;
+        margin: 0 0 0 10px;
+        display: flex;
+        align-items: center;
+    }
+    &__placeholder {
+        position: absolute;
+        pointer-events: none;
+        color:$input_placeholder;
+        &_none {
+            display: none;
+        }
+    }
+    input {
+        width: 100%;
+    }
+}
+
+.card {
+    width: 100%;
+    font-size: 13px;
+    &__wrapped {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid $input_border;
+    }
+    &__left {
+        display:flex;
+    }
+    &__avatar {
+        img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+        }
+    }
+    &__info {
+        padding: 0 0 0 10px;
+    }
+    &__fullname {
+        cursor: pointer;
+        font-weight: 700;
+        color: #2A5885;
+    }
+    &__add {
+        button {
+            padding: 7px 16px 7px;
+            color:white;
+            background-color:#5181B8;
+            border-radius: 4px;
+            &:hover {
+                opacity: .88;
+            }
+        }
+    }
+}

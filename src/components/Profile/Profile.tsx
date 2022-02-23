@@ -5,7 +5,7 @@ import classes from "./Profile.module.scss"
 import { ProfileApi } from "@/Api/profile";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import withCheckAuth from "../HOCs/withCheckAuth";
-import { userInfoActions } from "@/store/UserInfoReducer";
+import { userInfoActions } from "@/store/ProfileReducer";
 import noImage from "@/images/noImage.png"
 import ArrowUp from "../svg/ArrowUp";
 import { CSSTransition } from "react-transition-group";

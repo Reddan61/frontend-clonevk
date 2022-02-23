@@ -3,13 +3,15 @@ import { combineReducers, createStore } from "redux"
 import LoginReducer from "./LoginReducer"
 import PostsReducer from "./PostsReducer"
 import RegisterReducer from "./RegisterReducer"
-import UserInfoReducer from "./UserInfoReducer"
+import UserInfoReducer from "./ProfileReducer"
+import FriendsReducer from "./FiendsReducer"
 
 const reducers = combineReducers({
     register:RegisterReducer,
     login:LoginReducer,
     userinfo:UserInfoReducer,
-    posts:PostsReducer
+    posts:PostsReducer,
+    friends:FriendsReducer
 })
 
 export type RootState = ReturnType<typeof store.getState>
