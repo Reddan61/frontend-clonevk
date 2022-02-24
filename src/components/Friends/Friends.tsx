@@ -9,6 +9,7 @@ import { UsersApi } from "@/Api/users"
 import { useDispatch } from "react-redux"
 import { friendsActions, IFriend } from "@/store/FiendsReducer"
 import noImage from "@/images/noImage.png"
+import { ProfileApi } from "@/Api/profile"
 
 
 const Friends:React.FC = () => {
@@ -131,6 +132,12 @@ interface ICardProps {
 const Card:React.FC<ICardProps> = ({ user }) => {
     const navigate = useNavigate()
 
+    const { isAuth } = useAppSelector(state => state.login)
+    const [ isFriend, setIsFriend ] = useState(false)
+
+    const [ avatar, setAvatar ] = useState("")
+
+
     function redirect() {
         navigate(`/profile?id=${user._id}`,{
             replace:true
@@ -139,14 +146,41 @@ const Card:React.FC<ICardProps> = ({ user }) => {
 
     async function addToFriend() {
         const response = await UsersApi.addToFriend(user._id)
-        console.log(response)
+        if(response.message === "success") {
+            setIsFriend(response.payload.isFriend)
+        }
     }
+
+    async function deleteFriend() {
+        const response = await UsersApi.deleteFriend(user._id)
+        if(response.message === "success") {
+            setIsFriend(response.payload.isFriend)
+        }
+    }
+
+    async function getAvatar() {
+        const avatarUrlResponse = await ProfileApi.getImageUrl({public_id:user.avatar})
+        if(avatarUrlResponse.message === "success") { 
+            setAvatar(avatarUrlResponse.payload.image_url)
+        }
+    }
+
+    useEffect(() => {
+        (async function() {
+            const response = await UsersApi.isFriend(user._id)
+            
+            if(response.message === "success") {
+                setIsFriend(response.payload.isFriend)
+            }
+            await getAvatar()
+        })()
+    },[])
     
     return <div className={classes.card}>
         <div className={classes.card__wrapped}>
             <div className={classes.card__left}>
                 <div className={classes.card__avatar}>
-                    <img src = {noImage}/>
+                    <img src = {avatar || noImage}/>
                 </div>
                 <div className={classes.card__info}>
                     <div className={classes.card__fullname} onClick = {redirect}>
@@ -155,10 +189,17 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                 </div>
             </div>
             <div className={classes.card__right}>
-                <div className={classes.card__add}>
-                    <button onClick = {addToFriend}>Добавить в друзья</button>
-                </div>
+            {
+                (isAuth && !isFriend) &&
+                    <div className={classes.card__add}>
+                        <button onClick = {addToFriend}>Добавить в друзья</button>
+                    </div>
+            }
             </div>
+            {
+                isFriend && 
+                <div onClick = {deleteFriend}>X</div>
+            }
         </div>
     </div>
 }

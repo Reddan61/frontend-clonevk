@@ -17,7 +17,6 @@ interface IProps {
 
 const Post:React.FC<IProps> = ({post}) => {
     const { date, likes, text, author, imagesIds, _id, isLiked } = post
-
     const dispatch = useDispatch()
 
     const dateInstance = new Date(date)
@@ -51,7 +50,7 @@ const Post:React.FC<IProps> = ({post}) => {
                     isLiked: responseLike.payload.isLiked,
                     likes
                 }
-                dispatch(postsActions.setIsLike(payload))
+                dispatch(postsActions.setLike(payload))
             }
             setImages(imagesResponse)
             setLoading(false)
@@ -63,14 +62,13 @@ const Post:React.FC<IProps> = ({post}) => {
             return
         setLikeLoading(true)
         const response = await PostsApi.setLike(_id)
-        console.log(response)
         if(response.message === "success") {
             const payload = {
                 postId: _id,
                 isLiked: response.payload.isLiked,
                 likes: response.payload.likes
             }
-            dispatch(postsActions.setIsLike(payload))
+            dispatch(postsActions.setLike(payload))
         }
         setLikeLoading(false)
     }

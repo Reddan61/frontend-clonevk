@@ -74,7 +74,7 @@ const ProfilePosts:React.FC = () => {
 
     async function getProfilePosts(id:string) {
         const postsResponse = await getPosts(id)
-        console.log(postsResponse)
+
         if(postsResponse.message === "success") {
             setTotalPages(postsResponse.payload.totalPages)
             dispatch(postsActions.setPosts(postsResponse.payload.posts))

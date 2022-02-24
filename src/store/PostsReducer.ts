@@ -1,7 +1,7 @@
 import { AnyAction } from "redux"
 
 const SETPOSTS = "USERINFO/SETPOSTS"
-const SETISLIKED = "USERINFO/SETISLIKED"
+const SETLIKE = "USERINFO/SETLIKE"
 
 
 const intitalState = {
@@ -15,16 +15,17 @@ const PostsReducer = (state = intitalState,action:AnyAction) => {
                 ...state,
                 posts:action.payload.posts
             }
-        case SETISLIKED: 
+        case SETLIKE: 
             return {
                 ...state,
                 posts:state.posts.map(el => {
                     const post = el
 
-                    if(post._id === action.payload.postId)
+                    if(String(post._id) === String(action.payload.postId)){
                         post.isLiked = action.payload.isLiked
+                        post.likes = action.payload.likes
+                    }
 
-                    post.likes = action.payload.likes
 
                     return post
                 })
@@ -37,7 +38,7 @@ const PostsReducer = (state = intitalState,action:AnyAction) => {
 
 export const postsActions = {
     setPosts: (posts:Posts) => ({type:SETPOSTS,payload:{posts}}),
-    setIsLike: (payload:ISetIsLike) => ({type:SETISLIKED,payload})
+    setLike: (payload:ISetIsLike) => ({type:SETLIKE,payload})
 }
 
 

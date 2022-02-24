@@ -63,6 +63,50 @@ export class UsersApi {
             }
         }
     }
+    static async isFriend(userId:string):Promise<IApiResponse> {
+        try {
+            const response = await instance.get("users/isfriend",{
+                params: {
+                    userId
+                }
+            })
+
+            return {
+                message:"success",
+                payload: {
+                    ...response.data.payload
+                }
+            }
+        }
+        catch(e:any) {
+            return {
+                message:"error",
+                payload: {}
+            }
+        }
+    }
+    static async deleteFriend(userId:string):Promise<IApiResponse> {
+        try {
+            const response = await instance.delete("users/friends",{
+                data: {
+                    userId
+                }
+            })
+
+            return {
+                message:"success",
+                payload: {
+                    ...response.data.payload
+                }
+            }
+        }
+        catch(e:any) {
+            return {
+                message:"error",
+                payload: {}
+            }
+        }
+    }
 }
 
 interface IGetUsersPayload {

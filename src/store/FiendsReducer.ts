@@ -2,6 +2,7 @@ import { AnyAction } from "redux"
 
 const GETOTHERUSERS = "FRIENDS/GETOTHERUSERS"
 const SETFRIENDS = "FRIENDS/SETFRIENDS"
+const SETNEWFRIEND = "FRIENDS/SETNEWFRIEND"
 
 
 const intitalState = {
@@ -30,6 +31,7 @@ const FriendsReducer = (state = intitalState,action:AnyAction) => {
 export const friendsActions = {
     setOtherUsersAC: (payload:{users:IFriend[]}) => ({type:GETOTHERUSERS,payload}),
     setFriendsAC: (payload:{users:IFriend[]}) => ({type:SETFRIENDS,payload}),
+    setNewFriendAC: (payload:{userId:string}) => ({type:SETNEWFRIEND,payload}),
 }
 
 
@@ -38,5 +40,6 @@ export default FriendsReducer
 export interface IFriend {
     _id:string,
     firstName:string,
-    surname:string
+    surname:string,
+    avatar:string
 }
