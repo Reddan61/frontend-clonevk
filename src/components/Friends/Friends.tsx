@@ -1,5 +1,6 @@
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import {CSSTransition} from 'react-transition-group'
 import classes from "./Friends.module.scss"
 import withCheckAuth from "../HOCs/withCheckAuth"
 import SideBar from "../SideBar/SideBar"
@@ -133,9 +134,15 @@ const Card:React.FC<ICardProps> = ({ user }) => {
     const navigate = useNavigate()
 
     const { isAuth } = useAppSelector(state => state.login)
-    const [ isFriend, setIsFriend ] = useState(false)
 
+    const [ isFriend, setIsFriend ] = useState(false)
     const [ avatar, setAvatar ] = useState("")
+    const [ dotsHover, setDotsHover ] = useState(false)
+
+    const listBlockRef = useRef<HTMLDivElement>(null)
+    const dotsBlockRef = useRef<HTMLDivElement>(null)
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
 
 
     function redirect() {
@@ -175,6 +182,7 @@ const Card:React.FC<ICardProps> = ({ user }) => {
             await getAvatar()
         })()
     },[])
+
     
     return <div className={classes.card}>
         <div className={classes.card__wrapped}>
@@ -189,17 +197,68 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                 </div>
             </div>
             <div className={classes.card__right}>
-            {
-                (isAuth && !isFriend) &&
-                    <div className={classes.card__add}>
-                        <button onClick = {addToFriend}>Добавить в друзья</button>
+                {
+                    (isAuth && !isFriend) &&
+                        <div className={classes.card__add}>
+                            <button onClick = {addToFriend}>Добавить в друзья</button>
+                        </div>
+                }
+                {
+                    isFriend && 
+                    <div className={`${classes.card__menu} ${classes.manu}`}>
+                        <div className={classes.menu__wrapped}>
+                            <div onMouseEnter={() => {
+                                if(timeoutRef.current) {
+                                    clearTimeout(timeoutRef.current)
+                                }
+                                setDotsHover(true)
+                            }} 
+                            onMouseOut={() => {
+                                timeoutRef.current = setTimeout(() => {
+                                    setDotsHover(false)
+                                },1000)
+                            }}
+                            ref = {dotsBlockRef} className={classes.menu__dots}>
+                                <div></div>
+                            </div>
+                            <CSSTransition
+                                in = {dotsHover}
+                                timeout = {300}
+                                classNames = {{
+                                    enter:classes.animation__enter,
+                                    enterActive:classes.animation__enter_active,
+                                    exit:classes.animation__exit,
+                                    exitActive:classes.animation__exit_active
+                                }}
+                                nodeRef = {listBlockRef}
+                                unmountOnExit
+                            >
+                                <div onMouseEnter={() => {
+                                    if(timeoutRef.current) {
+                                        clearTimeout(timeoutRef.current)
+                                    }
+                                    setDotsHover(true)
+                                }} 
+                                    onMouseLeave={() => {
+                                        timeoutRef.current = setTimeout(() => {
+                                            setDotsHover(false)
+                                        },1000)
+                                    }}
+                                    onMouseMove = {() => {
+                                        if(timeoutRef.current) {
+                                            clearTimeout(timeoutRef.current)
+                                        }
+                                    }}
+                                ref = {listBlockRef} className={`${classes.menu__list} ${classes.friends__block}`}>
+                                    <ul>
+                                        <li onClick = {deleteFriend}>Удалить из друзей</li>
+                                    </ul>
+                                </div>
+                            </CSSTransition>
+                        </div>
                     </div>
-            }
+                }
             </div>
-            {
-                isFriend && 
-                <div onClick = {deleteFriend}>X</div>
-            }
         </div>
     </div>
 }

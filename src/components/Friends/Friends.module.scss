@@ -80,6 +80,9 @@
     &__left {
         display:flex;
     }
+    &__right {
+        display: flex;
+    }
     &__avatar {
         img {
             border-radius: 50%;
@@ -88,7 +91,7 @@
         }
     }
     &__info {
-        padding: 0 0 0 10px;
+        padding: 5px 0 0 20px;
     }
     &__fullname {
         cursor: pointer;
@@ -104,6 +107,111 @@
             &:hover {
                 opacity: .88;
             }
+        }
+    }
+    &__menu {
+
+    }
+}
+
+$dots__color:#aeb7c2;
+
+.menu {
+    &__wrapped {
+        width: 100%;
+    }
+    &__dots {
+        width: 20px;
+        height: 10px;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 7px 10px 0 0;
+        &::after,&::before{
+            position: absolute;
+            content: "";
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: $dots__color;
+        }
+        &::before {
+            margin: 0 12px 0 0;
+        }
+        &::after {
+            margin: 0 0 0 12px;
+        }
+        div {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: $dots__color;
+        }
+    }
+    &__list {
+        position: absolute;
+        margin: 10px 0 0;
+        transform: translate(-80%,0);
+        &::after {
+            content: ''; 
+            top: -1px;
+            right: 16.6px;
+            position: absolute;
+            border-radius: 1.5px;
+            width: 7px;
+            height: 4px;
+            background-color: white;
+            z-index: 2;
+        }
+        &::before {
+            content: ''; 
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            top: -3px;
+            right: 18px;
+            transform: rotate(45deg);
+            background-color: white;
+            box-shadow:  0 1px 0 0 #dce1e6, 0 0 0 1px #e7e8ec;
+            z-index: 1; 
+        }
+        ul {
+            display: flex;
+            flex-direction: column;
+            li {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                min-width: 160px;
+                width: 100%;
+                padding: 0 20px;
+                margin: 5px 0;
+                height: 30px;
+                &:hover {
+                    background-color: #f5f6f8;
+                }
+            }
+        }
+    }
+}
+
+.animation {
+    &__enter {
+        opacity: 0;
+        &_active {
+            transition: opacity .3s linear 0s;
+            opacity: 1;
+        }
+    }
+    &__exit {
+        opacity: 1;
+        &_active {
+            transition: opacity .3s linear 0s;
+            opacity: 0;
         }
     }
 }
