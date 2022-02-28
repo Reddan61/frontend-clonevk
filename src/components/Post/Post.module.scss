@@ -75,6 +75,7 @@ $skeleton: rgb(216, 216, 216);
     &__name {
         font-size: 13px;
         color:#2A5885;
+        cursor: pointer;
         span {
             & + span {
                 margin: 0 0 0 5px;

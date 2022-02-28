@@ -1,0 +1,30 @@
+@import "@/_vars.scss";
+
+.news {
+    width: 100%;
+    min-height: calc(100vh - #{$header_height});
+    background-color: $background_page;
+    display: flex;
+    justify-content: center;
+    &__container {
+        padding: 20px 0 0;
+        width: 100%;
+        max-width: $container;
+        display: flex;
+    }
+    &__sidebar {
+        padding: 0 0 0 15px;
+        min-width: 164px;
+    }
+    &__body {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px 0 0;
+    }
+}
+
+.observer {
+    width: 100%;
+    background-color: transparent;
+}

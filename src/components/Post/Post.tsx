@@ -9,6 +9,7 @@ import { PostsApi } from "@/Api/posts"
 import redHeart from "@/images/redHeart.png"
 import { IPost, postsActions } from "@/store/PostsReducer"
 import { useDispatch } from "react-redux"
+import { useNavigate } from "react-router"
 
 
 interface IProps {
@@ -20,6 +21,7 @@ const Post:React.FC<IProps> = ({post}) => {
     const dispatch = useDispatch()
 
     const dateInstance = new Date(date)
+    const navigate = useNavigate()
 
     const [isLoading, setLoading] = useState(true)
     const [likeLoading, setLikeLoading] = useState(false)
@@ -56,6 +58,11 @@ const Post:React.FC<IProps> = ({post}) => {
             setLoading(false)
         })()
     },[])
+    function redirect() {
+        navigate(`/profile?id=${author._id}`,{
+            replace:true
+        })
+    }
 
     async function setLiked() {
         if(likeLoading)
@@ -84,7 +91,7 @@ const Post:React.FC<IProps> = ({post}) => {
                         <img src = {avatar || noImage}/>
                     </div>
                     <div className={classes.card__info}>
-                        <div className={classes.card__name}>
+                        <div onClick = {redirect} className={classes.card__name}>
                             <span>{author.firstName}</span>
                             <span>{author.surname}</span>
                         </div>

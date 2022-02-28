@@ -6,6 +6,7 @@ import Email from "@/components/Auth/Email/Email"
 import Login from "@/components/Auth/Login/Login"
 import Profile from "./components/Profile/Profile"
 import Friends from "./components/Friends/Friends"
+import News from "./components/News/News"
 
 const App:React.FC = () => {
     return <Routes>
@@ -19,6 +20,9 @@ const App:React.FC = () => {
         </Route>
         <Route path = "friends" element = {<HeaderLayout />}>
             <Route index element = {<Friends />} /> 
+        </Route>
+        <Route path = "news" element = {<HeaderLayout />}>
+            <Route index element = {<News />} /> 
         </Route>
         <Route path="*" element={<Navigate to={"/auth"} replace/>} />
     </Routes>

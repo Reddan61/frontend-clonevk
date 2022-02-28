@@ -18,7 +18,11 @@ const SideBar:React.FC = () => {
                 <Profile width={20} height={20} color="#5181b8"/>
                 <span>Моя страница</span>
             </li>
-            <li>
+            <li onClick = {() => {
+                navigate("/news",{
+                    replace:true
+                })
+            }}>
                 <News width={20} height={20} color="#5181b8"/>
                 <span>Новости</span>
             </li>

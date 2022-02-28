@@ -67,6 +67,28 @@ export class PostsApi {
             }
         }
     }
+    static async getFriendsPosts(payload:IGetFriendsPostsPayload):Promise<IApiResponse> {
+        try {
+            const response = await instance.get(`posts/friends`,{
+                params : {
+                    ...payload
+                }
+            })
+
+            return {
+                message:"success",
+                payload: {
+                    ...response.data.payload
+                }
+            }
+        }
+        catch(e:any) {
+            return {
+                message:"error",
+                payload: {}
+            }
+        }
+    }
     static async setLike(postId:string):Promise<IApiResponse> {
         try {
             const response = await instance.patch(`posts/like`,{
@@ -87,6 +109,12 @@ export class PostsApi {
             }
         }
     }
+}
+
+export interface IGetFriendsPostsPayload {
+    userId:string,
+    pageSize:number,
+    page:number
 }
 
 export interface ICreatePostPayload {

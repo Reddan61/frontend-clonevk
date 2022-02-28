@@ -1,4 +1,5 @@
 @import "@/_vars.scss";
+$dots__color:#aeb7c2;
 
 
 .friends {
@@ -114,7 +115,6 @@
     }
 }
 
-$dots__color:#aeb7c2;
 
 .menu {
     &__wrapped {
@@ -214,11 +214,6 @@ $dots__color:#aeb7c2;
             opacity: 0;
         }
     }
-}
-
-.test {
-    width: 100%;
-    height: 100vh;
 }
 
 .observer {
