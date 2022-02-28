@@ -5,88 +5,82 @@ import classes from "./Friends.module.scss"
 import withCheckAuth from "../HOCs/withCheckAuth"
 import SideBar from "../SideBar/SideBar"
 import Search from "../svg/Search"
-import { useAppSelector } from "@/store/store"
+import { useAppDispatch, useAppSelector } from "@/store/store"
 import { UsersApi } from "@/Api/users"
 import { useDispatch } from "react-redux"
 import { friendsActions, IFriend } from "@/store/FiendsReducer"
 import noImage from "@/images/noImage.png"
 import { ProfileApi } from "@/Api/profile"
+import { IApiResponse } from "@/Api/interfacesApi"
 
 
 const Friends:React.FC = () => {
     const pageSize = 10
 
-    const [searchParams, setSearchParams] = useSearchParams()
+    const { userId } = useAppSelector(state => state.login)
 
     const dispatch = useDispatch()
 
-    const { userId } = useAppSelector(state => state.login)
-    const { other, friends } = useAppSelector(state => state.friends)
 
     const [isLoading, setLoading] = useState(false)
     const [inputValue, setInputValue] = useState("")
 
     const [friendsPage, setFriendsPage] = useState(1)
+    const [totalFriendsPages, setTotalFriendsPages] = useState(1)
+
     const [otherUsersPage, setOtherUsersPage] = useState(1)
-
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const [totalOtherUsersPages, setTotalOtherUsersPages] = useState(1)
     
-    async function getUsers(search:string) {
-        const response = await UsersApi.getUsers({
-            page:otherUsersPage,
-            pageSize,
-            search
-        })
-
-        return response.payload.users
-    }
-    async function getFriends(search:string) {
-        const response = await UsersApi.getFriends({
-            userId,
-            page:friendsPage,
-            pageSize,
-            search
-        })
-
-        return response.payload.users
-    }
+    
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     function inputChange(e:SyntheticEvent) {
         const target = e.target as HTMLInputElement
         
         if(timeoutRef.current) 
             clearTimeout(timeoutRef.current)
-        if(!target.value) {
-            dispatch(friendsActions.setOtherUsersAC({users: []}))
-            setInputValue(target.value)
-            return
-        }
         
         timeoutRef.current = setTimeout(async () => {
-            const users = await getUsers(target.value.trim())
-            const friends = await getFriends(target.value.trim())
-            dispatch(friendsActions.setFriendsAC({users: [...friends]}))
-            dispatch(friendsActions.setOtherUsersAC({users: [...users]}))
+            const friends = await getFriends(target.value.trim(),1)
+            if(friends.message === "success")
+                dispatch(friendsActions.setFriendsAC({users: [...friends.payload.users]}))
+            setFriendsPage(1)
+            setOtherUsersPage(1)
+            if(!target.value) {
+                dispatch(friendsActions.setOtherUsersAC({users: []}))
+                return
+            }
+            const users = await getUsers(target.value.trim(),1)
+            if(users.message === "success")
+                dispatch(friendsActions.setOtherUsersAC({users: [...users.payload.users]}))
+            
         },1000) 
 
         setInputValue(target.value)
     }
+  
+    async function getFriends(search:string,page = friendsPage) {
+        const response = await UsersApi.getFriends({
+            userId,
+            page,
+            pageSize,
+            search
+        })
+        if(response.message === "success")
+            setTotalFriendsPages(response.payload.totalPages)
+        return response
+    }
 
-    useEffect(() => {
-        (async function() {
-            const friends = await getFriends("")
-            dispatch(friendsActions.setOtherUsersAC({users: []}))
-            dispatch(friendsActions.setFriendsAC({users: [...friends]}))
-        })()
-    },[])
-    useEffect(() => {
-        (async function() {
-            if(!inputValue.length) {
-                const friends = await getFriends("")
-                dispatch(friendsActions.setFriendsAC({users: [...friends]}))
-            }
-        })()
-    },[inputValue])
+    async function getUsers(search:string,page = otherUsersPage) {
+        const response = await UsersApi.getUsers({
+            page,
+            pageSize,
+            search
+        })
+        if(response.message === "success")
+            setTotalOtherUsersPages(response.payload.totalPages)
+        return response
+    }
 
     return <div className={classes.friends}>
         <div className={classes.friends__container}>
@@ -105,20 +99,14 @@ const Friends:React.FC = () => {
                                 </div>
                             </div>
                             <div className={classes.friends__friends}>
-                                {friends.map((el:IFriend) => {
-                                    return <Card key = {el._id} user={el}/>
-                                })}
+                                <FriendsLists setPage={setFriendsPage} totalPages = {totalFriendsPages} getUsers={getFriends} page={friendsPage} inputValue={inputValue}/>
                             </div>
                         </div>
-                        {other.length > 0 && 
-                            <div className={`${classes.friends__other}  ${classes.friends__block}`}>
-                                {other.map((el:IFriend) => {
-                                    if(el._id === userId)
-                                        return
-                                    return <Card key = {el._id} user={el}/>
-                                })}
-                            </div>
-                        }
+                        
+                        <div className={`${classes.friends__other}  ${classes.friends__block}`}>
+                            <OtherUsersList getUsers={getUsers} page = {otherUsersPage} setPage = {setOtherUsersPage} totalPages = {totalOtherUsersPages} inputValue={inputValue} />
+                        </div>
+                        
                     </>
                 }
             </div>
@@ -210,10 +198,12 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                             <div onMouseEnter={() => {
                                 if(timeoutRef.current) {
                                     clearTimeout(timeoutRef.current)
+                                    timeoutRef.current = null
                                 }
                                 setDotsHover(true)
                             }} 
-                            onMouseOut={() => {
+                            onMouseLeave ={(e) => {
+                                const target = e.target as HTMLDivElement
                                 timeoutRef.current = setTimeout(() => {
                                     setDotsHover(false)
                                 },1000)
@@ -236,6 +226,7 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                                 <div onMouseEnter={() => {
                                     if(timeoutRef.current) {
                                         clearTimeout(timeoutRef.current)
+                                        timeoutRef.current = null
                                     }
                                     setDotsHover(true)
                                 }} 
@@ -247,6 +238,7 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                                     onMouseMove = {() => {
                                         if(timeoutRef.current) {
                                             clearTimeout(timeoutRef.current)
+                                            timeoutRef.current = null
                                         }
                                     }}
                                 ref = {listBlockRef} className={`${classes.menu__list} ${classes.friends__block}`}>
@@ -262,6 +254,131 @@ const Card:React.FC<ICardProps> = ({ user }) => {
         </div>
     </div>
 }
+
+interface IPropsList {
+    inputValue:string,
+    page:number,
+    setPage:(page:number) => void
+    getUsers:(search:string,page?:number) => Promise<IApiResponse>,
+    totalPages:number
+}
+
+const FriendsLists:React.FC<IPropsList> = ({inputValue,page, getUsers, totalPages, setPage}) => {
+    const { friends } = useAppSelector(state => state.friends)
+
+    const dispatch = useAppDispatch()
+
+    const [ isLoadingPagination, setLoadingPagination ] = useState(false)
+    const isLoadingPaginationRef = useRef<boolean>(isLoadingPagination)
+
+    const observerRef = useRef<HTMLDivElement>(null)
+    isLoadingPaginationRef.current = isLoadingPagination
+
+    useEffect(() => {
+        const target = observerRef.current
+        const observer = new IntersectionObserver(([entry]) => {
+            if(entry.isIntersecting && !isLoadingPaginationRef.current && totalPages > page) {
+                setLoadingPagination(true)
+                setPage(page + 1)
+            }
+        },{
+            root:null,
+            rootMargin:'0px',
+            threshold:0.1
+        })
+        if(target) {
+            observer.observe(target)
+        }
+        return () => {
+            if(target)
+                observer.unobserve(target)
+        }
+    },[observerRef.current,friends])
+
+    useEffect(() => {
+        (async function() {
+            const friendsResponse = await getUsers(inputValue)
+            if(friendsResponse.message === "success" && page <= 1) {
+                dispatch(friendsActions.setFriendsAC({users: [...friendsResponse.payload.users]}))
+            }
+            else if(friendsResponse.message === "success" && page > 1){
+                dispatch(friendsActions.setFriendsAC({users: [...friends,...friendsResponse.payload.users]}))
+            }
+            setLoadingPagination(false)
+        })()
+    },[page])
+
+    return <>  
+        {friends.map((el:IFriend) => {
+            return <Card key = {el._id} user={el}/>
+        })}
+        <div ref={observerRef} className={classes.observer}></div>
+    </>
+}
+
+
+const OtherUsersList:React.FC<IPropsList> = ({inputValue,getUsers,page,setPage,totalPages}) => {
+    const { userId } = useAppSelector(state => state.login)
+    const { other } = useAppSelector(state => state.friends)
+    
+    const dispatch = useAppDispatch()
+
+    const [ isLoadingPagination, setLoadingPagination ] = useState(false)
+    const isLoadingPaginationRef = useRef<boolean>(isLoadingPagination)
+
+    const observerRef = useRef<HTMLDivElement>(null)
+    isLoadingPaginationRef.current = isLoadingPagination
+
+  
+    useEffect(() => {
+        const target = observerRef.current
+        if(!target)
+            return
+        const observer = new IntersectionObserver(([entry]) => {
+            if(entry.isIntersecting && !isLoadingPaginationRef.current && totalPages > page) {
+                setLoadingPagination(true)
+                setPage(page + 1)
+            }
+        },{
+            root:null,
+            rootMargin:'0px',
+            threshold:0.1
+        })
+        if(target) {
+            observer.observe(target)
+        }
+        return () => {
+            if(target)
+                observer.unobserve(target)
+        }
+    },[observerRef.current,other])
+
+    useEffect(() => {
+        (async function() {
+            if(inputValue.length < 1)
+                return
+            const usersResponse = await getUsers(inputValue)
+            if(usersResponse.message === "success" && page <= 1 ) {
+                dispatch(friendsActions.setOtherUsersAC({users: [...usersResponse.payload.users]}))
+            } else if(usersResponse.message === "success" && page > 1) {
+                dispatch(friendsActions.setOtherUsersAC({users: [...other,...usersResponse.payload.users]}))
+            }
+            setLoadingPagination(false)
+        })()
+    },[page])
+
+    return <>
+        {other.length > 0 && other.map((el:IFriend) => {
+            if(el._id === userId)
+                return
+            return <Card key = {el._id} user={el}/>
+        })}
+        {
+            other.length > 0 && 
+                <div ref={observerRef} className={classes.observer}></div>
+        }
+    </>
+} 
 
 
 export default withCheckAuth(Friends)
