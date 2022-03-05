@@ -12,6 +12,7 @@ import { friendsActions, IFriend } from "@/store/FiendsReducer"
 import noImage from "@/images/noImage.png"
 import { ProfileApi } from "@/Api/profile"
 import { IApiResponse } from "@/Api/interfacesApi"
+import { NotificationsApi } from "@/Api/notifications"
 
 
 const Friends:React.FC = () => {
@@ -140,7 +141,7 @@ const Card:React.FC<ICardProps> = ({ user }) => {
     }
 
     async function addToFriend() {
-        const response = await UsersApi.addToFriend(user._id)
+        const response = await NotificationsApi.sendFriendInvite(user._id)
         if(response.message === "success") {
             setIsFriend(response.payload.isFriend)
         }

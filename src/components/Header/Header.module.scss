@@ -13,8 +13,25 @@
         width: 100%;
         padding: 0 15px 0;
     }
+    &__left {
+        display: flex;
+    }
     &__logo {
         padding: 10px 0;
+    }
+    &__notifications {
+        position: relative;
+        margin: 0 0 0 20px;
+    }
+    &__bell{
+        padding: 0 10px;
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        &:hover {
+            background-color: #f5f6f8;
+        }
     }
 }
 
@@ -77,6 +94,100 @@
     }
 }
 
+.notifications {
+    z-index: 999;
+    position: absolute;
+    width: 470px;
+    background-color: white;
+    padding: 12px 0 8px;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.3);
+    font-size: 13px;
+    &__title {
+        padding: 0 10px 10px;
+        font-weight: 700;
+        border-bottom: 1px solid $input_border;
+    }
+    &__body {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    &__total {
+        position: absolute;
+        border-radius: 18px;
+        background-color: #ff3347;
+        color:white;
+        right: 6px;
+        top: 6px;
+        min-height: 18px;
+        min-width: 18px;
+        max-height: 18px;
+        max-width: 18px;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: 10px;
+        line-height: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        pointer-events: none;
+        border: 2px solid white;
+        padding: 0 6px;
+    }
+}
+
+.notification {
+    width: 100%;
+    font-size: 13px;
+    &__wrapped {
+        width: 100%;
+        display: flex;
+        padding: 10px 10px;
+    }
+    &__left {
+        img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    }
+    &__right {
+        display: flex;
+        padding: 5px 0 0 10px;
+        flex-direction: column;
+    } 
+    &__info {
+        font-size: 12.5px;
+        font-weight: 700;
+    }
+    &__fullname {
+        color: #2a5885;
+        cursor: pointer;
+    }
+    &__button {
+        padding: 8px 0 0;
+        button {
+            padding: 7px 16px 7px;
+            color:white;
+            background-color:#5181B8;
+            border-radius: 4px;
+            &:hover {
+                opacity: .88;
+            }
+        }
+    }
+}
+
+.test {
+    width: 100%;
+    height: 900px;
+}
+.observer {
+    width: 100%;
+    background-color: transparent;
+}
 
 .animation {
     &__enter {
