@@ -32,6 +32,7 @@ export default {
         }
     },
     devServer: {
+        static: path.resolve(__dirname, 'dist'),
         historyApiFallback: true,
         open: true,
         compress: true,
