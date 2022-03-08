@@ -18,9 +18,12 @@ import withNonAuth from "@/components/HOCs/withNonAuth"
 const Email:React.FC = () => {
     const navigate = useNavigate()
     const dispatch = useAppDispatch()
+
     const [submitedEmail,setSubmitEmail] = useState(false)
     const [submitedCode,setSubmitCode] = useState(false)
     const [emailError,setEmailError] = useState(false)
+
+    const [ isLoading, setLoading ] = useState(false)
 
     const registeredId = useAppSelector(state => state.register._id)
 
@@ -35,15 +38,14 @@ const Email:React.FC = () => {
                 _id:registeredId || "",
                 email:values.email
             }
-            
+            setLoading(true)
             const response = await AuthApi.sendEmail(payload)
-
+            setLoading(false)
             if(response.message === "success") {
                 setSubmitEmail(true)
                 return
             }
-
-            alert("Что-то пошло не так!")
+            await EmailSchema.validate({error:"error"})
         } catch(validationError:any) {
             setEmailError(true)
         }
@@ -56,7 +58,9 @@ const Email:React.FC = () => {
                 code:values.code
             }
 
+            setLoading(true)
             const response = await AuthApi.verifyEmail(payload)
+            setLoading(false)
 
             if(response.message === "success") {
                 setSubmitCode(true)
@@ -77,12 +81,25 @@ const Email:React.FC = () => {
             _id:registeredId || "",
             password:values.password
         }
-        
+
+        setLoading(true)
         const response = await AuthApi.setPassword(payload)
+        setLoading(false)
 
         if(response.message === "success") {
             navigate("/auth/login",{replace:true})
             dispatch(registerActions.setIdAC(null))
+        }
+    }
+
+    function clickSubmitButton(e:any) {
+        e.preventDefault()
+        if(!submitedEmail) {
+            firstForm.current.handleSubmit()
+        } else if(submitedCode) {
+            thirdForm.current.handleSubmit()
+        } else {
+            secondForm.current.handleSubmit()
         }
     }
 
@@ -179,6 +196,7 @@ const Email:React.FC = () => {
                                     <div className = {classes.form__text}>Пароль</div>
                                     <Field className = {classes.form__password} name = "password" 
                                         component = {Input} placeholder = {"Введите пароль"}
+                                        isError = {Boolean(errors.password && touched.password)}
                                     />
                                     {Boolean(errors.password) &&
                                         <div className={classes.form__error}>{errors.password}</div>
@@ -189,16 +207,7 @@ const Email:React.FC = () => {
                     </Formik>
                 </div>
                 <div className = {classes.email__next}>
-                    <button type="submit" onClick = {(e) => {
-                        e.preventDefault()
-                        if(!submitedEmail) {
-                            firstForm.current.handleSubmit()
-                        } else if(submitedCode) {
-                            thirdForm.current.handleSubmit()
-                        } else {
-                            secondForm.current.handleSubmit()
-                        }
-                    }}>Далее</button>
+                    <button disabled={isLoading} type="submit" onClick = {clickSubmitButton}>Далее</button>
                 </div>
             </div>
         </div>

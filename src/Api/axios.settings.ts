@@ -1,7 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios"
+import config from "@/config/config"
+
 
 const instance = axios.create({
-    baseURL: process.env.BACKEND_URL
+    baseURL: config.backend_url
 })
 
 instance.interceptors.request.use(function (config:AxiosRequestConfig) {

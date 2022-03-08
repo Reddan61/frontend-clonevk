@@ -14,15 +14,19 @@ import Camera from "../svg/Camera";
 import { ICreatePostPayload, PostsApi } from "@/Api/posts";
 import ImagesGrid from "../ImagesGrid/ImagesGrid";
 import { isMongoDBId } from "@/utils/isMongoDBId";
-import Post from "../Post/Post";
 import { useDispatch } from "react-redux";
 import ProfilePosts from "./ProfilePosts";
 import { postsActions } from "@/store/PostsReducer";
 
-const Profile:React.FC = () => {
+interface IProfileProps {
+    isLoadingHOC?:boolean
+}
+
+const Profile:React.FC<IProfileProps> = ({ isLoadingHOC }) => {
     const navigate = useNavigate()
 
     const [searchParams, setSearchParams] = useSearchParams()
+    const [isLoading, setIsLoading] = useState(true)
 
     const [ isUpdatingAvatar, setUpdatingAvatar] = useState(false)
     const [ showMenu, setShowMenu] = useState(false)
@@ -58,6 +62,9 @@ const Profile:React.FC = () => {
 
     useEffect(() => {
         (async function() {
+            if(isLoadingHOC)
+                return
+            setIsLoading(true)
             const _id =  searchParams.get("id") ? searchParams.get("id") : userId
             if(!isMongoDBId(_id)) {
                 navigate("/auth/login",{
@@ -67,8 +74,9 @@ const Profile:React.FC = () => {
             }
             await getAvatar(_id)
             await getProfileInfo(_id)
+            setIsLoading(false)
         })()
-    },[searchParams.get("id")])
+    },[searchParams.get("id"),isLoadingHOC])
 
     function updateAvatar(e:any) {
         e.preventDefault()
@@ -106,6 +114,10 @@ const Profile:React.FC = () => {
             setUpdatingAvatar(false)
         }
 
+    }
+
+    if(isLoading) {
+        return <SkeletonProfile />
     }
 
     return <div className={classes.profile}>
@@ -175,6 +187,43 @@ const Profile:React.FC = () => {
                 }
                 <div className={`${classes.profile__posts}`}>
                     <ProfilePosts />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+const SkeletonProfile:React.FC = () => {
+    return <div className={classes.profile}>
+        <div className={classes.profile__container}>
+            <div className={classes.profile__sidebar}>
+                <SideBar dontClick = {true}/>
+            </div>
+            <div className={classes.profile__line}>
+                <div className={classes.avatar}>
+                    <div className={`${classes.avatar__wrapped} ${classes.profile__block}`}>
+                        <div className={`${classes.avatar__photo} ${classes.skeleton__photo}`}>
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className={classes.profile__line}>
+                <div className={`${classes.info} ${classes.profile__block}`}>
+                    <div className={classes.info__wrapped}>
+                        <div className={classes.info__top}>
+                            <div className={`${classes.info__title} ${classes.skeleton__title}`}>
+                            </div>
+                        </div>
+                        <div className={classes.info__center}>
+                            <ul className={classes.info__list}>
+                                <li>
+                                    <span className={classes.skeleton__span}>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

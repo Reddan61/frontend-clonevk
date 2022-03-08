@@ -5,12 +5,17 @@ import News from "../svg/News"
 import Profile from "../svg/Profile"
 import classes from "./SideBar.module.scss"
 
-const SideBar:React.FC = () => {
+interface IProps {
+    dontClick?:boolean
+}
+
+const SideBar:React.FC<IProps> = ({ dontClick }) => {
     const navigate = useNavigate()
 
     return <div className={classes.sidebar}>
         <ul>
             <li onClick = {() => {
+                if(!dontClick)
                 navigate("/profile",{
                     replace:true
                 })
@@ -19,6 +24,7 @@ const SideBar:React.FC = () => {
                 <span>Моя страница</span>
             </li>
             <li onClick = {() => {
+                if(!dontClick)
                 navigate("/news",{
                     replace:true
                 })
@@ -27,6 +33,7 @@ const SideBar:React.FC = () => {
                 <span>Новости</span>
             </li>
             <li onClick = {() => {
+                if(!dontClick)
                 navigate("/friends",{
                     replace:true
                 })

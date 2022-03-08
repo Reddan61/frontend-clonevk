@@ -30,6 +30,9 @@ const Post:React.FC<IProps> = ({post}) => {
     const [avatar,setAvatar] = useState<string>("")
     
     useEffect(() => {
+        const obj = {
+            isMounted:true
+        };
         (async function() {
             const imagesResponse:Array<string> = []
             if(imagesIds && imagesIds.length > 0) {
@@ -41,8 +44,9 @@ const Post:React.FC<IProps> = ({post}) => {
                 }
             }
             const responseImage = await ProfileApi.getImageUrl({public_id:author.avatar})
-            if(responseImage.message === "success")
+            if(responseImage.message === "success" && obj.isMounted) {
                 setAvatar(responseImage.payload.image_url)
+            }
 
             const responseLike = await PostsApi.isLiked(_id)
 
@@ -54,9 +58,14 @@ const Post:React.FC<IProps> = ({post}) => {
                 }
                 dispatch(postsActions.setLike(payload))
             }
+            if(!obj.isMounted)
+                return
             setImages(imagesResponse)
             setLoading(false)
         })()
+        return () => {
+            obj.isMounted = false
+        }
     },[])
     function redirect() {
         navigate(`/profile?id=${author._id}`,{

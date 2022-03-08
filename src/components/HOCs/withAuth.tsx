@@ -22,14 +22,11 @@ const withAuth = <WP,>(WrappedComponent : ComponentType<WP>) => {
             })()
         },[window.location.href])
 
-        if(isLoading) 
-            return <div>Loading...</div>
-
         if(!isAuth) {
             return <Navigate to={"/auth"} />
         }
 
-        return <WrappedComponent {...props as WP}/>
+        return <WrappedComponent isLoadingHOC = {isLoading} {...props as WP}/>
     }
 
     return WithWrapped

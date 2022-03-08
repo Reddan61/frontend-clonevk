@@ -216,3 +216,19 @@
         }
     }
 }
+
+.skeleton {
+    &__photo {
+        background-color: $skeleton;
+    }
+    &__title {
+        background-color: $skeleton;
+        height: 21px;
+    }
+    &__span {
+        width: 100%;
+        display: block;
+        height: 10px;
+        background-color: $skeleton;
+    }
+}

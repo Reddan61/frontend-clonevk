@@ -21,10 +21,7 @@ const withCheckAuth = <WP,>(WrappedComponent : ComponentType<WP>) => {
             })()
         },[window.location.href])
 
-        if(isLoading) 
-            return <div>Loading...</div>
-
-        return <WrappedComponent {...props as WP}/>
+        return <WrappedComponent isLoadingHOC={isLoading} {...props as WP}/>
     }
 
     return WithWrapped

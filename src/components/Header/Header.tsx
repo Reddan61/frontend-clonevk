@@ -14,8 +14,12 @@ import { UsersApi } from "@/Api/users"
 import Bell from "../svg/Bell"
 import { NotificationsApi } from "@/Api/notifications"
 
+interface IProps {
+    isLoadingHOC?:boolean
+}
 
-const Header:React.FC = () => {
+
+const Header:React.FC<IProps> = ({isLoadingHOC}) => {
     const { isAuth, userId } = useAppSelector(state => state.login)
     
     const navigate = useNavigate()
@@ -42,16 +46,19 @@ const Header:React.FC = () => {
 
     useEffect(() => {
         (async function() {
+            if(isLoadingHOC)
+                return
             const responsePublicUrl = await ProfileApi.getAvatar({_id:userId})
             if(responsePublicUrl.message === "success") {
                 const responseUrl = await ProfileApi.getImageUrl({public_id:responsePublicUrl.payload.public_id})
                 if(responseUrl.message === "success")
                     setAvatar(responseUrl.payload.image_url)
             }
+            
             setNotificationsPage(1)
             setTotalNotificationsPages(1)
         })()
-    },[userId])
+    },[userId,isLoadingHOC])
 
     useEffect(() => {
         getTotalNotRead()
@@ -208,11 +215,18 @@ const Notification:React.FC<INotificationProp> = ({notification,getTotalNotRead,
     const navigate = useNavigate()
 
     useEffect(() => {
+        const obj = {
+            isMounted:true
+        };
         (async function() {
             const responseUrl = await ProfileApi.getImageUrl({public_id:notification.author.avatar})
-            if(responseUrl.message === "success")
+            if(responseUrl.message === "success" && obj.isMounted)
                 setAvatar(responseUrl.payload.image_url)
         })()
+
+        return () => {
+            obj.isMounted = false
+        }
     },[])
 
     useEffect(() => {

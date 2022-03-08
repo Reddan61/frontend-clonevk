@@ -7,8 +7,12 @@ import Post from "../Post/Post"
 import SideBar from "../SideBar/SideBar"
 import classes from "./News.module.scss"
 
+interface IProps {
+    isLoadingHOC?:boolean
+}
 
-const News:React.FC = () => {
+
+const News:React.FC<IProps> = ({ isLoadingHOC }) => {
     const pageSize = 10
     
     const { userId } = useAppSelector(state => state.login)
@@ -27,6 +31,8 @@ const News:React.FC = () => {
 
     useEffect(() => {
         const target = observerRef.current
+        if(!target) 
+            return
         const observer = new IntersectionObserver(([entry]) => {
             if(entry.isIntersecting && !isLoadingPaginationRef.current && totalPages > page) {
                 setLoadingPagination(true)
@@ -48,6 +54,8 @@ const News:React.FC = () => {
 
     useEffect(() => {
         (async function() {
+            if(isLoadingHOC)
+                return
             const payload:IGetFriendsPostsPayload = {
                 userId,
                 page,
@@ -66,12 +74,12 @@ const News:React.FC = () => {
             setLoading(false)
             setLoadingPagination(false)
         })()
-    },[page])
+    },[page, isLoadingHOC])
 
     return <div className={classes.news}>
         <div className={classes.news__container}>
             <div className={classes.news__sidebar}>
-                <SideBar />
+                <SideBar dontClick = {isLoading || isLoadingHOC}/>
             </div>
             <div className={classes.news__body}>
                 {
@@ -79,7 +87,9 @@ const News:React.FC = () => {
                         return <Post key = {el._id} post={el}/>
                     })
                 }
-                <div ref={observerRef} className={classes.observer}></div>
+                {
+                    isLoading || <div ref={observerRef} className={classes.observer}></div>
+                }
             </div>
         </div>
     </div>

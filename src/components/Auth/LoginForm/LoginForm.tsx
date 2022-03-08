@@ -10,11 +10,12 @@ import { useSearchParams } from "react-router-dom"
 interface IProps {
     withRegisterButton?:boolean,
     setError?: (bool:boolean) => void,
+    isLoading?:boolean,
     submit: (values:any,{}:FormikHelpers<any>) => void
 }
 
 
-const LoginForm:React.FC<IProps> = ({withRegisterButton, setError, submit}) => {
+const LoginForm:React.FC<IProps> = ({withRegisterButton, setError, submit, isLoading}) => {
     const navigate = useNavigate()
     const  [query,setQuery] = useSearchParams()
   
@@ -46,10 +47,10 @@ const LoginForm:React.FC<IProps> = ({withRegisterButton, setError, submit}) => {
                     isError = {Boolean(errors.password && touched.password)}
                 />
                 <div  className = {classes.login__buttons}>
-                    <button className = {classes.login__submit} type = "submit">Войти</button>
+                    <button disabled = {isLoading} className = {classes.login__submit} type = "submit">Войти</button>
                     {
                         withRegisterButton &&
-                        <button type="button" onClick={redirectToRegister}  className = {classes.login__register}>Регистрация</button>
+                        <button disabled = {isLoading} type="button" onClick={redirectToRegister}  className = {classes.login__register}>Регистрация</button>
                     }
                 </div>
             </Form>

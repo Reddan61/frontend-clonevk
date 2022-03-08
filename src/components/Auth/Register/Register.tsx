@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Field, Form, Formik, FormikHelpers } from "formik"
 import { useNavigate } from "react-router-dom"
 import Input from "@/components/Formik/Input/Input"
@@ -15,7 +15,11 @@ import { registerActions } from "@/store/RegisterReducer"
 const Register:React.FC = () => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
+
+    const [isLoading, setIsLoading] = useState(false)
+    
     const month = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"]
+    
     const submit = async (values:any,{setFieldError}:FormikHelpers<any>) => {
         try {
             const validateResult = await RegisterShema.validate(values,{ abortEarly: false })
@@ -30,6 +34,7 @@ const Register:React.FC = () => {
                 }
             }
 
+            setIsLoading(true)
             const response = await AuthApi.preRegister(payload)
 
             if(response.message !== "success") {
@@ -49,6 +54,7 @@ const Register:React.FC = () => {
             const messageError = error.inner[0]?.message
  
             setFieldError(fieldError,messageError)
+            setIsLoading(false)
         }
     }
     function getDayCount() {
@@ -118,7 +124,7 @@ const Register:React.FC = () => {
                         })}
                     </Field>
                 </div>
-                <button className = {classes.register__submit} type = "submit">Продолжить регистрацию</button>
+                <button disabled = {isLoading} className = {classes.register__submit} type = "submit">Продолжить регистрацию</button>
             </Form>
         )}
     </Formik>

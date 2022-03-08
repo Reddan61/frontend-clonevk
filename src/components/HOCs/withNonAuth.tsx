@@ -23,7 +23,7 @@ const withNonAuth = <WP,>(WrappedComponent : ComponentType<WP>) => {
         },[window.location.href])
 
         if(isLoading) 
-            return <div>Loading...</div>
+            return <div></div>
 
         if(isAuth) {
             return <Navigate to={"/profile"} />

@@ -15,7 +15,11 @@ import { IApiResponse } from "@/Api/interfacesApi"
 import { NotificationsApi } from "@/Api/notifications"
 
 
-const Friends:React.FC = () => {
+interface IProps {
+    isLoadingHOC?:boolean
+}
+
+const Friends:React.FC<IProps> = ({ isLoadingHOC }) => {
     const pageSize = 10
 
     const { userId } = useAppSelector(state => state.login)
@@ -86,11 +90,11 @@ const Friends:React.FC = () => {
     return <div className={classes.friends}>
         <div className={classes.friends__container}>
             <div className={classes.friends__sidebar}>
-                <SideBar />
+                <SideBar dontClick={isLoadingHOC || isLoading}/>
             </div> 
             <div className={classes.friends__body}>
                 {
-                    !isLoading && <>
+                    isLoading || isLoadingHOC || <>
                         <div className={`${classes.friends__top} ${classes.friends__block}`}>
                             <div className={`${classes.friends__input} ${classes.input}`}>
                                 <Search width={24} height={24} color={"none"}/>

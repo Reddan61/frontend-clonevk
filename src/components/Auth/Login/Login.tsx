@@ -11,7 +11,7 @@ import { loginActions } from "@/store/LoginReducer"
 
 const Login:React.FC = () => {
     const [isError,setError] = useState(false)
-
+    const [isLoading,setLoading] = useState(false)
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
@@ -23,7 +23,7 @@ const Login:React.FC = () => {
                 email:values.email,
                 password:values.password
             }
-
+            setLoading(true)
             const response = await AuthApi.login(payload)
             
 
@@ -40,6 +40,7 @@ const Login:React.FC = () => {
         } catch(e:any) {
             const fieldError = e.inner[0]?.path 
             const messageError = e.inner[0]?.message
+            setLoading(false)
             if(fieldError && messageError) 
                 setFieldError(fieldError,messageError)
         }
@@ -63,7 +64,7 @@ const Login:React.FC = () => {
                 </div>
             }
             <div className={classes.login__form}>
-                <LoginForm submit={submit} withRegisterButton = {true} setError={setError}/>
+                <LoginForm isLoading = {isLoading} submit={submit} withRegisterButton = {true} setError={setError}/>
             </div>
         </div>
     </div>
