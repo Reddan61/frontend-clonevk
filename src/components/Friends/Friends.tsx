@@ -128,7 +128,7 @@ const Card:React.FC<ICardProps> = ({ user }) => {
 
     const { isAuth } = useAppSelector(state => state.login)
 
-    const [ isLoading, setLoading ] = useState(false)
+    const [ isLoading, setLoading ] = useState(true)
 
 
     const [ isFriend, setIsFriend ] = useState(false)
@@ -203,50 +203,25 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                     </div>
                 </div>
             </div>
-            <div className={classes.card__right}>
-                {
-                    (isAuth && !isFriend && !isSentInvite) &&
-                        <div className={classes.card__add}>
-                            <button onClick = {addToFriend}>Добавить в друзья</button>
-                        </div>
-                }
-                {
-                    isSentInvite && 
-                    <div className={classes.card__sent}>
-                        Заявка отправлена
-                    </div>
-                }
-                {
-                    isFriend && 
-                    <div className={`${classes.card__menu} ${classes.manu}`}>
-                        <div className={classes.menu__wrapped}>
-                            <div onMouseEnter={() => {
-                                if(timeoutRef.current) {
-                                    clearTimeout(timeoutRef.current)
-                                    timeoutRef.current = null
-                                }
-                                setDotsHover(true)
-                            }} 
-                            onMouseLeave ={(e) => {
-                                timeoutRef.current = setTimeout(() => {
-                                    setDotsHover(false)
-                                },1000)
-                            }}
-                            ref = {dotsBlockRef} className={classes.menu__dots}>
-                                <div></div>
+            {
+                !isLoading && 
+                <div className={classes.card__right}>
+                    {
+                        isAuth && !isFriend && !isSentInvite &&
+                            <div className={classes.card__add}>
+                                <button onClick = {addToFriend}>Добавить в друзья</button>
                             </div>
-                            <CSSTransition
-                                in = {dotsHover}
-                                timeout = {300}
-                                classNames = {{
-                                    enter:classes.animation__enter,
-                                    enterActive:classes.animation__enter_active,
-                                    exit:classes.animation__exit,
-                                    exitActive:classes.animation__exit_active
-                                }}
-                                nodeRef = {listBlockRef}
-                                unmountOnExit
-                            >
+                    }
+                    {
+                        isSentInvite && 
+                        <div className={classes.card__sent}>
+                            Заявка отправлена
+                        </div>
+                    }
+                    {
+                        isFriend && 
+                        <div className={`${classes.card__menu} ${classes.manu}`}>
+                            <div className={classes.menu__wrapped}>
                                 <div onMouseEnter={() => {
                                     if(timeoutRef.current) {
                                         clearTimeout(timeoutRef.current)
@@ -254,27 +229,55 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                                     }
                                     setDotsHover(true)
                                 }} 
-                                    onMouseLeave={() => {
-                                        timeoutRef.current = setTimeout(() => {
-                                            setDotsHover(false)
-                                        },1000)
+                                onMouseLeave ={(e) => {
+                                    timeoutRef.current = setTimeout(() => {
+                                        setDotsHover(false)
+                                    },1000)
+                                }}
+                                ref = {dotsBlockRef} className={classes.menu__dots}>
+                                    <div></div>
+                                </div>
+                                <CSSTransition
+                                    in = {dotsHover}
+                                    timeout = {300}
+                                    classNames = {{
+                                        enter:classes.animation__enter,
+                                        enterActive:classes.animation__enter_active,
+                                        exit:classes.animation__exit,
+                                        exitActive:classes.animation__exit_active
                                     }}
-                                    onMouseMove = {() => {
+                                    nodeRef = {listBlockRef}
+                                    unmountOnExit
+                                >
+                                    <div onMouseEnter={() => {
                                         if(timeoutRef.current) {
                                             clearTimeout(timeoutRef.current)
                                             timeoutRef.current = null
                                         }
-                                    }}
-                                ref = {listBlockRef} className={`${classes.menu__list} ${classes.friends__block}`}>
-                                    <ul>
-                                        <li onClick = {deleteFriend}>Удалить из друзей</li>
-                                    </ul>
-                                </div>
-                            </CSSTransition>
+                                        setDotsHover(true)
+                                    }} 
+                                        onMouseLeave={() => {
+                                            timeoutRef.current = setTimeout(() => {
+                                                setDotsHover(false)
+                                            },1000)
+                                        }}
+                                        onMouseMove = {() => {
+                                            if(timeoutRef.current) {
+                                                clearTimeout(timeoutRef.current)
+                                                timeoutRef.current = null
+                                            }
+                                        }}
+                                    ref = {listBlockRef} className={`${classes.menu__list} ${classes.friends__block}`}>
+                                        <ul>
+                                            <li onClick = {deleteFriend}>Удалить из друзей</li>
+                                        </ul>
+                                    </div>
+                                </CSSTransition>
+                            </div>
                         </div>
-                    </div>
-                }
-            </div>
+                    }
+                </div>
+            }
         </div>
     </div>
 }
