@@ -294,7 +294,9 @@ const Notification:React.FC<INotificationProp> = ({notification,getTotalNotRead,
                 <div className={classes.notification__button}>
                     {
                         isAddedFriend ?
-                            "Добавлен"
+                            <div className={classes.notification__accepted}>
+                                Заявка принята
+                            </div>
                         :
                         <button onClick = {acceptFriendInvite}>Добавить в друзья</button>
                     }
