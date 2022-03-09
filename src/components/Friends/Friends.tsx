@@ -2,7 +2,6 @@ import React, { SyntheticEvent, useEffect, useRef, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import {CSSTransition} from 'react-transition-group'
 import classes from "./Friends.module.scss"
-import withCheckAuth from "../HOCs/withCheckAuth"
 import SideBar from "../SideBar/SideBar"
 import Search from "../svg/Search"
 import { useAppDispatch, useAppSelector } from "@/store/store"
@@ -13,6 +12,7 @@ import noImage from "@/images/noImage.png"
 import { ProfileApi } from "@/Api/profile"
 import { IApiResponse } from "@/Api/interfacesApi"
 import { NotificationsApi } from "@/Api/notifications"
+import withAuth from "../HOCs/withAuth"
 
 
 interface IProps {
@@ -25,7 +25,6 @@ const Friends:React.FC<IProps> = ({ isLoadingHOC }) => {
     const { userId } = useAppSelector(state => state.login)
 
     const dispatch = useDispatch()
-
 
     const [isLoading, setLoading] = useState(false)
     const [inputValue, setInputValue] = useState("")
@@ -94,7 +93,8 @@ const Friends:React.FC<IProps> = ({ isLoadingHOC }) => {
             </div> 
             <div className={classes.friends__body}>
                 {
-                    isLoading || isLoadingHOC || <>
+                    isLoading || isLoadingHOC || 
+                    <>
                         <div className={`${classes.friends__top} ${classes.friends__block}`}>
                             <div className={`${classes.friends__input} ${classes.input}`}>
                                 <Search width={24} height={24} color={"none"}/>
@@ -128,10 +128,15 @@ const Card:React.FC<ICardProps> = ({ user }) => {
 
     const { isAuth } = useAppSelector(state => state.login)
 
+    const [ isLoading, setLoading ] = useState(false)
+
+
     const [ isFriend, setIsFriend ] = useState(false)
+    const [ isSentInvite, setIsSentInvite ] = useState(false)
     const [ avatar, setAvatar ] = useState("")
     const [ dotsHover, setDotsHover ] = useState(false)
 
+    const isMountedRef = useRef<boolean>(true)
     const listBlockRef = useRef<HTMLDivElement>(null)
     const dotsBlockRef = useRef<HTMLDivElement>(null)
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -147,7 +152,7 @@ const Card:React.FC<ICardProps> = ({ user }) => {
     async function addToFriend() {
         const response = await NotificationsApi.sendFriendInvite(user._id)
         if(response.message === "success") {
-            setIsFriend(response.payload.isFriend)
+            setIsSentInvite(true)
         }
     }
 
@@ -160,20 +165,29 @@ const Card:React.FC<ICardProps> = ({ user }) => {
 
     async function getAvatar() {
         const avatarUrlResponse = await ProfileApi.getImageUrl({public_id:user.avatar})
-        if(avatarUrlResponse.message === "success") { 
+        if(avatarUrlResponse.message === "success" && isMountedRef.current) { 
             setAvatar(avatarUrlResponse.payload.image_url)
         }
     }
 
     useEffect(() => {
+        isMountedRef.current = true;
         (async function() {
+            setLoading(true)
+
             const response = await UsersApi.isFriend(user._id)
             
-            if(response.message === "success") {
+            if(response.message === "success" && isMountedRef.current) {
                 setIsFriend(response.payload.isFriend)
             }
             await getAvatar()
+            if(isMountedRef.current)
+                setLoading(false)
         })()
+
+        return () => {
+            isMountedRef.current = false
+        }
     },[])
 
     
@@ -191,10 +205,16 @@ const Card:React.FC<ICardProps> = ({ user }) => {
             </div>
             <div className={classes.card__right}>
                 {
-                    (isAuth && !isFriend) &&
+                    (isAuth && !isFriend && !isSentInvite) &&
                         <div className={classes.card__add}>
                             <button onClick = {addToFriend}>Добавить в друзья</button>
                         </div>
+                }
+                {
+                    isSentInvite && 
+                    <div className={classes.card__sent}>
+                        Заявка отправлена
+                    </div>
                 }
                 {
                     isFriend && 
@@ -208,7 +228,6 @@ const Card:React.FC<ICardProps> = ({ user }) => {
                                 setDotsHover(true)
                             }} 
                             onMouseLeave ={(e) => {
-                                const target = e.target as HTMLDivElement
                                 timeoutRef.current = setTimeout(() => {
                                     setDotsHover(false)
                                 },1000)
@@ -360,8 +379,11 @@ const OtherUsersList:React.FC<IPropsList> = ({inputValue,getUsers,page,setPage,t
 
     useEffect(() => {
         (async function() {
-            if(inputValue.length < 1)
+            if(inputValue.length < 1) {
+                dispatch(friendsActions.setOtherUsersAC({users: []}))
+                setPage(1)
                 return
+            }
             const usersResponse = await getUsers(inputValue)
             if(usersResponse.message === "success" && page <= 1 ) {
                 dispatch(friendsActions.setOtherUsersAC({users: [...usersResponse.payload.users]}))
@@ -386,4 +408,4 @@ const OtherUsersList:React.FC<IPropsList> = ({inputValue,getUsers,page,setPage,t
 } 
 
 
-export default withCheckAuth(Friends)
+export default withAuth(Friends)

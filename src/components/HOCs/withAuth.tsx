@@ -13,13 +13,17 @@ const withAuth = <WP,>(WrappedComponent : ComponentType<WP>) => {
         const dispatch = useAppDispatch()
 
         useEffect(() => {
+            let isMounted = true;
             (async function() {
                 const response = await AuthApi.me()
-                if(response.message === "success") {
+                if(response.message === "success" && isMounted) {
                     dispatch(loginActions.loginAC(response.payload._id))
+                    setLoading(false)
                 }
-                setLoading(false)
             })()
+            return () => {
+                isMounted = false
+            }
         },[window.location.href])
 
         if(!isAuth) {
